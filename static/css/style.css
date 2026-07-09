@@ -1,0 +1,182 @@
+/* ==========================
+   Google Font
+========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ==========================
+   General Styling
+========================== */
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #ffe4ec, #ffd6e7, #fff0f5);
+    margin: 0;
+    padding: 0;
+}
+
+/* ==========================
+   Container
+========================== */
+
+.container {
+    width: 420px;
+    margin: 60px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
+    transition: 0.3s;
+}
+
+.container:hover {
+    transform: translateY(-3px);
+}
+
+/* ==========================
+   Headings
+========================== */
+
+h1,
+h2,
+h3 {
+    color: #d63384;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* ==========================
+   Labels
+========================== */
+
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #b03060;
+}
+
+/* ==========================
+   Input Fields
+========================== */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ffc0cb;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+}
+
+input:focus {
+    border-color: #ff69b4;
+    box-shadow: 0 0 8px rgba(255,105,180,0.3);
+}
+
+/* ==========================
+   Buttons
+========================== */
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 22px;
+    background: linear-gradient(45deg, #ff69b4, #ff85c1);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.03);
+    background: linear-gradient(45deg, #ff4fa2, #ff6fb5);
+}
+
+/* ==========================
+   Links
+========================== */
+
+a {
+    color: #d63384;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+a:hover {
+    color: #ff1493;
+    text-decoration: underline;
+}
+
+/* ==========================
+   Paragraphs
+========================== */
+
+p {
+    text-align: center;
+    color: #555;
+}
+
+/* ==========================
+   Flash Messages
+========================== */
+
+.message {
+    background: #ffe6f0;
+    border-left: 6px solid #ff69b4;
+    color: #c2185b;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+/* ==========================
+   Horizontal Line
+========================== */
+
+hr {
+    border: none;
+    height: 2px;
+    background: #ffd1dc;
+    margin: 20px 0;
+}
+
+/* ==========================
+   File Upload
+========================== */
+
+input[type="file"] {
+    background: #fff7fa;
+}
+
+/* ==========================
+   Small Animation
+========================== */
+
+.container {
+    animation: fadeIn 0.7s ease;
+}
+
+@keyframes fadeIn {
+
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

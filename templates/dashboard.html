@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Candidate Dashboard</h1>
+
+        <hr>
+
+        <!-- Flash Messages -->
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+
+                    <div class="message">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Welcome {{ name }} 👋</h2>
+
+        <p><strong>Email :</strong> {{ email }}</p>
+
+        <hr>
+
+        <h3>Exam Controls</h3>
+
+        <br>
+
+        <a href="{{ url_for('exam.start_exam') }}">
+            <button>▶ Start Exam</button>
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('exam.pause_exam') }}">
+            <button>⏸ Pause Exam</button>
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('exam.resume_exam') }}">
+            <button>▶ Resume Exam</button>
+        </a>
+
+        <br><br>
+
+        <a href="{{ url_for('exam.end_exam') }}">
+            <button>⏹ End Exam</button>
+        </a>
+
+        <br><br><br>
+
+        <a href="{{ url_for('auth.logout') }}">
+            <button>Logout</button>
+        </a>
+
+    </div>
+
+</body>
+
+</html>

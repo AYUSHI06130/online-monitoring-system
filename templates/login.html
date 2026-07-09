@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Candidate Login</title>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Candidate Login</h2>
+
+{% with messages = get_flashed_messages() %}
+
+{% if messages %}
+
+{% for message in messages %}
+
+<div class="message">
+
+{{ message }}
+
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+{% endwith %}
+
+<form method="POST">
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+placeholder="Enter Email"
+required>
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+placeholder="Enter Password"
+required>
+
+<button type="submit">
+
+Login
+
+</button>
+
+</form>
+
+<br>
+
+<p>
+
+Don't have an account?
+
+<a href="/register">
+
+Register Here
+
+</a>
+
+</p>
+
+</div>
+
+</body>
+
+</html>
