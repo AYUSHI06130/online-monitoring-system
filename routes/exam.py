@@ -1,6 +1,13 @@
-from flask import Blueprint, redirect, url_for, session, flash
+from flask import Blueprint, render_template, redirect, url_for
+from flask import flash, session
+from flask import request,jsonify,session
+
 import sqlite3
 from datetime import datetime
+
+import subprocess
+import sys
+import os
 
 from config import DATABASE
 
@@ -13,7 +20,6 @@ exam = Blueprint("exam", __name__)
 
 # ==========================================
 # Helper Function
-# Returns the latest session of the candidate
 # ==========================================
 
 def get_latest_session(candidate_id):
@@ -23,7 +29,9 @@ def get_latest_session(candidate_id):
 
     cursor.execute("""
 
-    SELECT session_id, status
+    SELECT
+        session_id,
+        status
 
     FROM Session
 
@@ -35,11 +43,41 @@ def get_latest_session(candidate_id):
 
     """, (candidate_id,))
 
-    latest_session = cursor.fetchone()
+    latest = cursor.fetchone()
 
     connection.close()
 
-    return latest_session
+    return latest
+
+
+# ==========================================
+# Exam Page
+# ==========================================
+
+@exam.route("/exam")
+def exam_page():
+
+    if "candidate_id" not in session:
+
+        flash("Please login first.")
+
+        return redirect(url_for("auth.login"))
+
+    latest = get_latest_session(session["candidate_id"])
+
+    status = "Not Started"
+
+    if latest:
+
+        status = latest[1]
+
+    return render_template(
+    "exam.html",
+    status=status,
+    exam_ended=(status == "Ended")
+    )
+
+    
 
 
 # ==========================================
@@ -57,31 +95,37 @@ def start_exam():
 
     candidate_id = session["candidate_id"]
 
-    latest_session = get_latest_session(candidate_id)
+    latest = get_latest_session(candidate_id)
 
-    # If exam is already running
-    if latest_session and latest_session[1] == "Running":
+    # --------------------------------------
 
-        flash("Exam is already running.")
+    if latest:
 
-        return redirect(url_for("auth.dashboard"))
+        if latest[1] == "Running":
 
-    # If exam is paused
-    if latest_session and latest_session[1] == "Paused":
+            flash("Exam is already running.")
 
-        flash("Exam is paused. Please resume it instead.")
+            return redirect(url_for("exam.exam_page"))
 
-        return redirect(url_for("auth.dashboard"))
+        if latest[1] == "Paused":
+
+            flash("Resume the exam instead of starting again.")
+
+            return redirect(url_for("exam.exam_page"))
+
+    # --------------------------------------
 
     connection = sqlite3.connect(DATABASE)
+
     cursor = connection.cursor()
 
     cursor.execute("""
 
     INSERT INTO Session
-    (candidate_id, start_time, status)
 
-    VALUES (?, ?, ?)
+    (candidate_id,start_time,status)
+
+    VALUES(?,?,?)
 
     """,
 
@@ -96,19 +140,76 @@ def start_exam():
     ))
 
     connection.commit()
+
     connection.close()
+
+    #start face monitoring
+
+    project_root = os.path.dirname(os.path.dirname(__file__))
+
+    subprocess.Popen(
+        [
+            sys.executable,
+            "-m",
+            "utils.face_monitor"
+        ],
+        cwd=project_root
+    )
 
     flash("Exam Started Successfully.")
 
-    return redirect(url_for("auth.dashboard"))
+    return redirect(url_for("exam.exam_page"))
+
+# ==========================================
+# Log Browser Activity
+# ==========================================
+
+@exam.route("/log_browser_event", methods=["POST"])
+def log_browser_event():
+
+    candidate_id = session.get("candidate_id")
+
+    if candidate_id is None:
+        return jsonify({"status": "error"}), 401
+
+    data = request.get_json()
+
+    event_type = data["event_type"]
+    remarks = data["remarks"]
+
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        INSERT INTO EventLog
+        (
+            candidate_id,
+            event_type,
+            timestamp,
+            remarks
+        )
+
+        VALUES (?, ?, ?, ?)
+    """,
+    (
+        candidate_id,
+        event_type,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        remarks
+    ))
+
+    connection.commit()
+    connection.close()
+
+    return jsonify({"status": "success"}) 
 
 
 # ==========================================
-# Pause Exam
+# Pause / Resume
 # ==========================================
 
-@exam.route("/pause_exam")
-def pause_exam():
+@exam.route("/toggle_exam")
+def toggle_exam():
 
     if "candidate_id" not in session:
 
@@ -116,122 +217,85 @@ def pause_exam():
 
         return redirect(url_for("auth.login"))
 
-    candidate_id = session["candidate_id"]
+    latest = get_latest_session(session["candidate_id"])
 
-    latest_session = get_latest_session(candidate_id)
+    if latest is None:
 
-    # No exam started
-    if latest_session is None:
+        flash("Start the exam first.")
 
-        flash("You have not started an exam yet.")
+        return redirect(url_for("exam.exam_page"))
 
-        return redirect(url_for("auth.dashboard"))
+    session_id = latest[0]
 
-    # Already paused
-    if latest_session[1] == "Paused":
+    status = latest[1]
 
-        flash("Exam is already paused.")
+    connection = sqlite3.connect(DATABASE)
 
-        return redirect(url_for("auth.dashboard"))
+    cursor = connection.cursor()
 
-    # Exam completed
-    if latest_session[1] == "Completed":
+    # --------------------------------------
+
+    if status == "Running":
+
+        cursor.execute("""
+
+        UPDATE Session
+
+        SET status=?
+
+        WHERE session_id=?
+
+        """,
+
+        (
+
+            "Paused",
+
+            session_id
+
+        ))
+
+        flash("Exam Paused Successfully.")
+
+    # --------------------------------------
+
+    elif status == "Paused":
+
+        cursor.execute("""
+
+        UPDATE Session
+
+        SET status=?
+
+        WHERE session_id=?
+
+        """,
+
+        (
+
+            "Running",
+
+            session_id
+
+        ))
+
+        flash("Exam Resumed Successfully.")
+
+    # --------------------------------------
+
+    elif status == "Ended":
 
         flash("Exam has already ended.")
 
-        return redirect(url_for("auth.dashboard"))
+        connection.close()
 
-    connection = sqlite3.connect(DATABASE)
-    cursor = connection.cursor()
-
-    cursor.execute("""
-
-    UPDATE Session
-
-    SET status=?
-
-    WHERE session_id=?
-
-    """,
-
-    (
-
-        "Paused",
-
-        latest_session[0]
-
-    ))
+        return redirect(url_for("exam.exam_page"))
 
     connection.commit()
+
     connection.close()
 
-    flash("Exam Paused Successfully.")
-
-    return redirect(url_for("auth.dashboard"))
-
-
-# ==========================================
-# Resume Exam
-# ==========================================
-
-@exam.route("/resume_exam")
-def resume_exam():
-
-    if "candidate_id" not in session:
-
-        flash("Please login first.")
-
-        return redirect(url_for("auth.login"))
-
-    candidate_id = session["candidate_id"]
-
-    latest_session = get_latest_session(candidate_id)
-
-    if latest_session is None:
-
-        flash("You have not started an exam yet.")
-
-        return redirect(url_for("auth.dashboard"))
-
-    if latest_session[1] == "Running":
-
-        flash("Exam is already running.")
-
-        return redirect(url_for("auth.dashboard"))
-
-    if latest_session[1] == "Completed":
-
-        flash("Exam has already ended.")
-
-        return redirect(url_for("auth.dashboard"))
-
-    connection = sqlite3.connect(DATABASE)
-    cursor = connection.cursor()
-
-    cursor.execute("""
-
-    UPDATE Session
-
-    SET status=?
-
-    WHERE session_id=?
-
-    """,
-
-    (
-
-        "Running",
-
-        latest_session[0]
-
-    ))
-
-    connection.commit()
-    connection.close()
-
-    flash("Exam Resumed Successfully.")
-
-    return redirect(url_for("auth.dashboard"))
+    return redirect(url_for("exam.exam_page"))
 
 
 # ==========================================
@@ -247,29 +311,26 @@ def end_exam():
 
         return redirect(url_for("auth.login"))
 
-    candidate_id = session["candidate_id"]
+    latest = get_latest_session(session["candidate_id"])
 
-    latest_session = get_latest_session(candidate_id)
+    if latest is None:
 
-    if latest_session is None:
+        flash("Start the exam first.")
 
-        flash("You have not started an exam yet.")
+        return redirect(url_for("exam.exam_page"))
 
-        return redirect(url_for("auth.dashboard"))
+    session_id = latest[0]
 
-    if latest_session[1] == "Paused":
+    status = latest[1]
 
-        flash("Resume the exam before ending it.")
+    if status == "Ended":
 
-        return redirect(url_for("auth.dashboard"))
+        flash("Exam already ended.")
 
-    if latest_session[1] == "Completed":
-
-        flash("Exam has already ended.")
-
-        return redirect(url_for("auth.dashboard"))
+        return redirect(url_for("exam.exam_page"))
 
     connection = sqlite3.connect(DATABASE)
+
     cursor = connection.cursor()
 
     cursor.execute("""
@@ -278,9 +339,9 @@ def end_exam():
 
     SET
 
-    end_time=?,
+        end_time=?,
 
-    status=?
+        status=?
 
     WHERE session_id=?
 
@@ -290,15 +351,16 @@ def end_exam():
 
         datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
-        "Completed",
+        "Ended",
 
-        latest_session[0]
+        session_id
 
     ))
 
     connection.commit()
+
     connection.close()
 
     flash("Exam Ended Successfully.")
 
-    return redirect(url_for("auth.dashboard"))
+    return redirect(url_for("exam.exam_page"))

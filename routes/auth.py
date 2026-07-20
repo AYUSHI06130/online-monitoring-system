@@ -1,17 +1,19 @@
 from flask import Blueprint, render_template, request
 from flask import redirect, url_for
 from flask import flash, session
+from datetime import datetime
 
 import sqlite3
 import re
-from datetime import datetime
-from utils.camera import capture_photo
 
 from config import DATABASE
+from utils.camera import capture_photo
 
-# Create Blueprint
+# ==========================================
+# Blueprint
+# ==========================================
+
 auth = Blueprint("auth", __name__)
-
 
 # ==========================================
 # Candidate Registration
@@ -27,9 +29,9 @@ def register():
         email = request.form["email"].strip()
         password = request.form["password"].strip()
 
-        # ----------------------------
-        # Validation
-        # ----------------------------
+        # -----------------------------
+        # Empty Field Validation
+        # -----------------------------
 
         if candidate_id == "" or name == "" or email == "" or password == "":
 
@@ -37,9 +39,9 @@ def register():
 
             return redirect(url_for("auth.register"))
 
-        # ----------------------------
+        # -----------------------------
         # Email Validation
-        # ----------------------------
+        # -----------------------------
 
         email_pattern = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'
 
@@ -49,31 +51,29 @@ def register():
 
             return redirect(url_for("auth.register"))
 
-        # ----------------------------
-        # Capture Candidate Photo
-        # ----------------------------
+        # -----------------------------
+        # Capture Photo
+        # -----------------------------
 
         photo_path = capture_photo(candidate_id)
-        print("Returned from capture_photo()")
-        print(photo_path)
 
         if photo_path is None:
 
-            flash("Photo capture cancelled.")
+            flash("Photo Capture Cancelled.")
 
             return redirect(url_for("auth.register"))
 
-        # ----------------------------
+        # -----------------------------
         # Database Connection
-        # ----------------------------
+        # -----------------------------
 
         connection = sqlite3.connect(DATABASE)
 
         cursor = connection.cursor()
 
-        # ----------------------------
+        # -----------------------------
         # Duplicate Email Check
-        # ----------------------------
+        # -----------------------------
 
         cursor.execute(
 
@@ -93,10 +93,10 @@ def register():
 
             return redirect(url_for("auth.register"))
 
-        # ----------------------------
+        # -----------------------------
         # Insert Candidate
-        # ----------------------------
-        print("About to insert into database")
+        # -----------------------------
+
         cursor.execute("""
 
         INSERT INTO Candidate
@@ -117,13 +117,13 @@ def register():
         connection.commit()
 
         connection.close()
-        print("Database committed")
 
-        flash("Registration Successful.")
+        flash("Registration Successful!")
 
         return redirect(url_for("auth.login"))
 
     return render_template("register.html")
+
 
 # ==========================================
 # Candidate Login
@@ -134,16 +134,8 @@ def login():
 
     if request.method == "POST":
 
-        # -------------------------
-        # Get Login Data
-        # -------------------------
-
         email = request.form["email"].strip()
         password = request.form["password"].strip()
-
-        # -------------------------
-        # Empty Field Validation
-        # -------------------------
 
         if email == "" or password == "":
 
@@ -151,21 +143,16 @@ def login():
 
             return redirect(url_for("auth.login"))
 
-        # -------------------------
-        # Connect to Database
-        # -------------------------
-
         connection = sqlite3.connect(DATABASE)
 
         cursor = connection.cursor()
 
-        # -------------------------
-        # Check Login Credentials
-        # -------------------------
-
         cursor.execute("""
 
-        SELECT candidate_id, name, email
+        SELECT
+            candidate_id,
+            name,
+            email
 
         FROM Candidate
 
@@ -182,25 +169,30 @@ def login():
 
         user = cursor.fetchone()
 
-        connection.close()
-
-        # -------------------------
-        # Login Successful
-        # -------------------------
-
         if user:
 
             session["candidate_id"] = user[0]
             session["name"] = user[1]
             session["email"] = user[2]
 
+            cursor.execute("""
+            INSERT INTO EventLog
+            (candidate_id,event_type,timestamp,remarks)
+            VALUES(?,?,?,?)
+            """,
+
+            (
+                session["candidate_id"],
+                "Exam Started",
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "Candidate Logged In"
+            ))
+            connection.commit()
+            connection.close()
+
             flash("Login Successful!")
 
             return redirect(url_for("auth.dashboard"))
-
-        # -------------------------
-        # Login Failed
-        # -------------------------
 
         else:
 
@@ -210,6 +202,7 @@ def login():
 
     return render_template("login.html")
 
+
 # ==========================================
 # Dashboard
 # ==========================================
@@ -217,13 +210,17 @@ def login():
 @auth.route("/dashboard")
 def dashboard():
 
-    if "name" not in session:
+    if "candidate_id" not in session:
+
+        flash("Please login first.")
 
         return redirect(url_for("auth.login"))
 
     return render_template(
 
         "dashboard.html",
+
+        candidate_id=session["candidate_id"],
 
         name=session["name"],
 
@@ -239,41 +236,9 @@ def dashboard():
 @auth.route("/logout")
 def logout():
 
-    connection = sqlite3.connect(DATABASE)
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-
-    UPDATE Session
-
-    SET
-
-    end_time=?,
-    status=?
-
-    WHERE
-
-    candidate_id=?
-    AND
-    status='Active'
-
-    """,
-
-    (
-
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        "Completed",
-        session["candidate_id"]
-
-    ))
-
-    connection.commit()
-
-    connection.close()
-
     session.clear()
 
-    flash("Logged out successfully.")
+    flash("Logged Out Successfully.")
 
     return redirect(url_for("auth.login"))
+

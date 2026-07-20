@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Online Exam</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+    <h1>Online Examination</h1>
+
+    <hr>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+
+                <div class="message">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <h2>Current Status</h2>
+
+    <h3>{{ status }}</h3>
+
+    <br>
+
+    <!-- Browser monitoring information-->
+    <h2>Browser Monitoring</h2>
+    <p>
+        <strong>Browser Status:</strong> 
+        <span id="browser-status">
+            Browser is active
+        </span>    
+    </p>
+    <p>
+        <strong>Focus Lost Count:</strong>
+        <span id="focus-count">
+            0
+        </span>
+    </p>
+    <p>
+        <strong>Last Focus Loss:</strong>
+        <span id="last-focus-time">
+            --
+        </span>  
+    </p>
+    
+    <br>
+
+    <a href="{{ url_for('exam.start_exam') }}">
+        <button>Start Exam</button>
+    </a>
+
+    <br><br>
+
+    <a href="{{ url_for('exam.toggle_exam') }}">
+        <button>Pause / Resume</button>
+    </a>
+
+    <br><br>
+
+    <a href="{{ url_for('exam.end_exam') }}">
+        <button>End Exam</button>
+    </a>
+
+    <br><br>
+
+    {% if exam_ended %}
+
+    <br><br>
+
+    <a href="{{ url_for('auth.dashboard') }}">
+    <button>Back to Dashboard</button>
+    </a>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

@@ -3,50 +3,84 @@ import os
 
 
 def capture_photo(candidate_id):
+    """
+    Opens webcam and captures one photo.
 
-    os.makedirs("static/uploads", exist_ok=True)
+    SPACE -> Capture photo
+    ESC   -> Cancel
+    """
 
-    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    # ---------------------------------
+    # Create uploads folder
+    # ---------------------------------
+
+    upload_folder = "static/uploads"
+
+    os.makedirs(upload_folder, exist_ok=True)
+
+    # ---------------------------------
+    # Open Webcam
+    # ---------------------------------
+
+    camera = cv2.VideoCapture(0)
 
     if not camera.isOpened():
-        print("Unable to open webcam.")
+
+        print("Unable to access webcam.")
+
         return None
 
-    print("Press SPACE to capture.")
+    print("\n====================================")
+    print("Camera Started")
+    print("Press SPACE to capture photo.")
     print("Press ESC to cancel.")
+    print("====================================\n")
 
-    photo_path = f"static/uploads/{candidate_id}.jpg"
+    photo_path = os.path.join(
+        upload_folder,
+        f"{candidate_id}.jpg"
+    )
 
     while True:
 
-        ret, frame = camera.read()
+        success, frame = camera.read()
 
-        if not ret:
+        if not success:
+
             print("Failed to read frame.")
+
             break
 
-        cv2.imshow("Candidate Photo", frame)
+        cv2.imshow("Capture Candidate Photo", frame)
 
         key = cv2.waitKey(1) & 0xFF
 
-        # SPACE BAR
+        # -------------------------
+        # SPACE Key
+        # -------------------------
+
         if key == 32:
 
-            if cv2.imwrite(photo_path, frame):
-                print("Photo Saved Successfully.")
-            else:
-                print("Failed to save photo.")
+            cv2.imwrite(photo_path, frame)
+
+            print("Photo Saved Successfully.")
 
             break
 
-        # ESC
+        # -------------------------
+        # ESC Key
+        # -------------------------
+
         elif key == 27:
 
-            print("Capture Cancelled.")
+            print("Photo Capture Cancelled.")
+
             photo_path = None
+
             break
 
     camera.release()
+
     cv2.destroyAllWindows()
 
     return photo_path
