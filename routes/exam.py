@@ -493,19 +493,16 @@ def end_exam():
 def get_monitoring_status():
 
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
-    # -----------------------------
+    # ----------------------------------
     # Monitoring Status
-    # -----------------------------
+    # ----------------------------------
 
     cursor.execute("""
 
         SELECT
-
             face_status,
-
             face_absence_count
 
         FROM MonitoringStatus
@@ -522,17 +519,17 @@ def get_monitoring_status():
 
     monitoring = cursor.fetchone()
 
-    # -----------------------------
-    # Current Exam Session
-    # -----------------------------
+    # ----------------------------------
+    # Current Session
+    # ----------------------------------
 
     cursor.execute("""
 
         SELECT
-
             start_time,
-
-            status
+            status,
+            paused_at,
+            total_pause_seconds
 
         FROM Session
 
@@ -554,38 +551,129 @@ def get_monitoring_status():
 
     connection.close()
 
-    # -----------------------------
+    # ----------------------------------
     # Face Status
-    # -----------------------------
+    # ----------------------------------
 
     if monitoring:
 
         face_status = monitoring[0]
-
         face_absence_count = monitoring[1]
 
     else:
 
         face_status = "Unknown"
-
         face_absence_count = 0
 
-    # -----------------------------
-    # Session Status
-    # -----------------------------
+    # ----------------------------------
+    # Timer Calculation
+    # ----------------------------------
 
     session_status = "Not Started"
+    elapsed_seconds = 0
 
     if exam:
 
+        start_time = datetime.strptime(
+            exam[0],
+            "%Y-%m-%d %H:%M:%S"
+        )
+
         session_status = exam[1]
+
+        paused_at = exam[2]
+
+        total_pause_seconds = exam[3] or 0
+
+        # --------------------------
+        # Running
+        # --------------------------
+
+        if session_status == "Running":
+
+            elapsed_seconds = int(
+
+                (datetime.now() - start_time).total_seconds()
+
+            ) - total_pause_seconds
+
+        # --------------------------
+        # Paused
+        # --------------------------
+
+        elif session_status == "Paused":
+
+            pause_time = datetime.strptime(
+
+                paused_at,
+
+                "%Y-%m-%d %H:%M:%S"
+
+            )
+
+            elapsed_seconds = int(
+
+                (pause_time - start_time).total_seconds()
+
+            ) - total_pause_seconds
+
+        # --------------------------
+        # Ended
+        # --------------------------
+
+        elif session_status == "Ended":
+
+            cursor = sqlite3.connect(DATABASE).cursor()
+
+            connection = sqlite3.connect(DATABASE)
+
+            cursor = connection.cursor()
+
+            cursor.execute("""
+
+                SELECT end_time
+
+                FROM Session
+
+                WHERE candidate_id=?
+
+                ORDER BY session_id DESC
+
+                LIMIT 1
+
+            """,
+
+            (
+
+                session["candidate_id"],
+
+            ))
+
+            end = cursor.fetchone()
+
+            connection.close()
+
+            if end and end[0]:
+
+                end_time = datetime.strptime(
+
+                    end[0],
+
+                    "%Y-%m-%d %H:%M:%S"
+
+                )
+
+                elapsed_seconds = int(
+
+                    (end_time - start_time).total_seconds()
+
+                ) - total_pause_seconds
 
     return jsonify({
 
         "face_status": face_status,
-
         "face_absence_count": face_absence_count,
-
-        "session_status": session_status
+        "session_status": session_status,
+        "elapsed_seconds": max(elapsed_seconds, 0)
 
     })

@@ -142,23 +142,15 @@ function updateCurrentTime() {
 // Session Timer
 // =======================================================
 
-let sessionSeconds = 0;
+function updateSessionTimer(elapsedSeconds) {
 
-function updateSessionTimer() {
+    const hours = Math.floor(elapsedSeconds / 3600);
 
-    sessionSeconds++;
+    const minutes = Math.floor((elapsedSeconds % 3600) / 60);
 
-    let hours =
-        Math.floor(sessionSeconds / 3600);
+    const seconds = elapsedSeconds % 60;
 
-    let minutes =
-        Math.floor((sessionSeconds % 3600) / 60);
-
-    let seconds =
-        sessionSeconds % 60;
-
-    const timerElement =
-        document.getElementById("session-timer");
+    const timerElement = document.getElementById("session-timer");
 
     if (timerElement) {
 
@@ -182,7 +174,7 @@ updateBrowserInformation();
 
 updateCurrentTime();
 
-updateSessionTimer();
+
 
 // =======================================================
 // Start Automatic Updates
@@ -190,7 +182,7 @@ updateSessionTimer();
 
 setInterval(updateCurrentTime, 1000);
 
-setInterval(updateSessionTimer, 1000);
+
 
 // ======================================
 // Update Face Monitoring Information
@@ -209,6 +201,8 @@ function updateFaceMonitoring() {
 
             document.getElementById("absence-count").innerText =
                 data.face_absence_count;
+            
+            updateSessionTimer(data.elapsed_seconds);    
 
         })
 
@@ -220,6 +214,6 @@ function updateFaceMonitoring() {
 
 }
 
-setInterval(updateFaceMonitoring, 1000);
+setInterval(updateFaceMonitoring, 500);
 
 updateFaceMonitoring();
