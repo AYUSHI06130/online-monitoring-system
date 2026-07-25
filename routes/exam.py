@@ -288,7 +288,6 @@ def toggle_exam():
     if "candidate_id" not in session:
 
         flash("Please login first.")
-
         return redirect(url_for("auth.login"))
 
     latest = get_latest_session(session["candidate_id"])
@@ -296,77 +295,117 @@ def toggle_exam():
     if latest is None:
 
         flash("Start the exam first.")
-
         return redirect(url_for("exam.exam_page"))
 
     session_id = latest[0]
-
     status = latest[1]
 
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
-    # --------------------------------------
+    # ==========================================
+    # Pause Exam
+    # ==========================================
 
     if status == "Running":
 
         cursor.execute("""
 
-        UPDATE Session
+            UPDATE Session
 
-        SET status=?
+            SET
+                status=?,
+                paused_at=?
 
-        WHERE session_id=?
+            WHERE session_id=?
 
         """,
 
         (
 
             "Paused",
-
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             session_id
 
         ))
 
         flash("Exam Paused Successfully.")
 
-    # --------------------------------------
+    # ==========================================
+    # Resume Exam
+    # ==========================================
 
     elif status == "Paused":
 
         cursor.execute("""
 
-        UPDATE Session
+            SELECT
+                paused_at,
+                total_pause_seconds
 
-        SET status=?
+            FROM Session
 
-        WHERE session_id=?
+            WHERE session_id=?
+
+        """,
+
+        (
+
+            session_id,
+
+        ))
+
+        data = cursor.fetchone()
+
+        paused_at = data[0]
+        total_pause = data[1]
+
+        paused_time = datetime.strptime(
+            paused_at,
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+        pause_duration = int(
+            (datetime.now() - paused_time).total_seconds()
+        )
+
+        total_pause += pause_duration
+
+        cursor.execute("""
+
+            UPDATE Session
+
+            SET
+                status=?,
+                paused_at=NULL,
+                total_pause_seconds=?
+
+            WHERE session_id=?
 
         """,
 
         (
 
             "Running",
-
+            total_pause,
             session_id
 
         ))
 
         flash("Exam Resumed Successfully.")
 
-    # --------------------------------------
+    # ==========================================
+    # Already Ended
+    # ==========================================
 
     elif status == "Ended":
 
         flash("Exam has already ended.")
-
         connection.close()
 
         return redirect(url_for("exam.exam_page"))
 
     connection.commit()
-
     connection.close()
 
     return redirect(url_for("exam.exam_page"))
@@ -457,6 +496,10 @@ def get_monitoring_status():
 
     cursor = connection.cursor()
 
+    # -----------------------------
+    # Monitoring Status
+    # -----------------------------
+
     cursor.execute("""
 
         SELECT
@@ -467,7 +510,7 @@ def get_monitoring_status():
 
         FROM MonitoringStatus
 
-        WHERE candidate_id = ?
+        WHERE candidate_id=?
 
     """,
 
@@ -477,25 +520,72 @@ def get_monitoring_status():
 
     ))
 
-    data = cursor.fetchone()
+    monitoring = cursor.fetchone()
+
+    # -----------------------------
+    # Current Exam Session
+    # -----------------------------
+
+    cursor.execute("""
+
+        SELECT
+
+            start_time,
+
+            status
+
+        FROM Session
+
+        WHERE candidate_id=?
+
+        ORDER BY session_id DESC
+
+        LIMIT 1
+
+    """,
+
+    (
+
+        session["candidate_id"],
+
+    ))
+
+    exam = cursor.fetchone()
 
     connection.close()
 
-    if data:
+    # -----------------------------
+    # Face Status
+    # -----------------------------
 
-        return jsonify({
+    if monitoring:
 
-            "face_status": data[0],
+        face_status = monitoring[0]
 
-            "face_absence_count": data[1]
+        face_absence_count = monitoring[1]
 
-        })
+    else:
+
+        face_status = "Unknown"
+
+        face_absence_count = 0
+
+    # -----------------------------
+    # Session Status
+    # -----------------------------
+
+    session_status = "Not Started"
+
+    if exam:
+
+        session_status = exam[1]
 
     return jsonify({
 
-        "face_status": "Unknown",
+        "face_status": face_status,
 
-        "face_absence_count": 0
+        "face_absence_count": face_absence_count,
 
-    })   
+        "session_status": session_status
 
+    })
