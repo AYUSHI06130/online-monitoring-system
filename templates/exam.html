@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
 <head>
+
 
     <meta charset="UTF-8">
 
-    <title>Online Exam</title>
+
+    <title>Online Examination</title>
+
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
+
 
 </head>
 
@@ -18,83 +23,191 @@
 
 <div class="container">
 
+
     <h1>Online Examination</h1>
 
+
     <hr>
+
+
+    <!-- ========================================= -->
+    <!-- Flash Messages -->
+    <!-- ========================================= -->
+
 
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
 
+
                 <div class="message">
                     {{ message }}
                 </div>
+
 
             {% endfor %}
         {% endif %}
     {% endwith %}
 
+
+    <!-- ========================================= -->
+    <!-- Exam Status -->
+    <!-- ========================================= -->
+
+
     <h2>Current Status</h2>
+
 
     <h3>{{ status }}</h3>
 
-    <br>
 
-    <!-- Browser monitoring information-->
-    <h2>Browser Monitoring</h2>
+    <hr>
+
+
+    <!-- ========================================= -->
+    <!-- Real-Time Monitoring Dashboard -->
+    <!-- ========================================= -->
+
+
+    <h2>Real-Time Monitoring Dashboard</h2>
+
+
     <p>
-        <strong>Browser Status:</strong> 
-        <span id="browser-status">
-            Browser is active
-        </span>    
+        <strong>Candidate Name:</strong>
+        {{ name }}
     </p>
+
+
     <p>
-        <strong>Focus Lost Count:</strong>
+        <strong>Candidate ID:</strong>
+        {{ candidate_id }}
+    </p>
+
+
+    <p>
+        <strong>Face Status:</strong>
+
+
+        <span id="face-status">
+            Face Detected
+        </span>
+    </p>
+
+
+    <p>
+        <strong>Browser Status:</strong>
+
+
+        <span id="browser-status">
+            Browser Active
+        </span>
+    </p>
+
+
+    <p>
+        <strong>Face Absence Count:</strong>
+
+
+        <span id="absence-count">
+            0
+        </span>
+    </p>
+
+
+    <p>
+        <strong>Browser Focus Loss Count:</strong>
+
+
         <span id="focus-count">
             0
         </span>
     </p>
+
+
     <p>
         <strong>Last Focus Loss:</strong>
+
+
         <span id="last-focus-time">
             --
-        </span>  
+        </span>
     </p>
-    
-    <br>
+
+
+    <p>
+        <strong>Current Date & Time:</strong>
+
+
+        <span id="current-time">
+        </span>
+    </p>
+
+
+    <p>
+        <strong>Session Timer:</strong>
+
+
+        <span id="session-timer">
+            00:00:00
+        </span>
+    </p>
+
+
+    <hr>
+
+
+    <!-- ========================================= -->
+    <!-- Exam Controls -->
+    <!-- ========================================= -->
+
 
     <a href="{{ url_for('exam.start_exam') }}">
         <button>Start Exam</button>
     </a>
 
+
     <br><br>
+
 
     <a href="{{ url_for('exam.toggle_exam') }}">
         <button>Pause / Resume</button>
     </a>
 
+
     <br><br>
+
 
     <a href="{{ url_for('exam.end_exam') }}">
         <button>End Exam</button>
     </a>
 
+
     <br><br>
+
 
     {% if exam_ended %}
 
-    <br><br>
 
-    <a href="{{ url_for('auth.dashboard') }}">
-    <button>Back to Dashboard</button>
-    </a>
+        <a href="{{ url_for('auth.dashboard') }}">
+            <button>Back to Dashboard</button>
+        </a>
+
 
     {% endif %}
 
+
 </div>
+
+
+<!-- ========================================= -->
+<!-- JavaScript -->
+<!-- ========================================= -->
+
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+
 </body>
+
 
 </html>

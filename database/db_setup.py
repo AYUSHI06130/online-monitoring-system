@@ -85,8 +85,31 @@ print("===================================")
 print("Database Created Successfully")
 print("===================================")
 
+# ==========================================
+# Monitoring Status Table
+# ==========================================
+
+cursor.execute("""
+
+CREATE TABLE IF NOT EXISTS MonitoringStatus(
+
+    candidate_id TEXT PRIMARY KEY,
+
+    face_status TEXT,
+
+    face_absence_count INTEGER,
+
+    browser_status TEXT,
+
+    browser_focus_loss_count INTEGER,
+
+    last_updated TEXT
+
+)
+
+""")
+
 connection.commit()
 
 connection.close()
-
 

@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for
+from flask import send_from_directory
 from flask import flash, session
 from flask import request,jsonify,session
 
@@ -74,7 +75,9 @@ def exam_page():
     return render_template(
     "exam.html",
     status=status,
-    exam_ended=(status == "Ended")
+    exam_ended=(status == "Ended"),
+    name=session["name"],
+    candidate_id=session["candidate_id"]
     )
 
     
@@ -86,6 +89,7 @@ def exam_page():
 
 @exam.route("/start_exam")
 def start_exam():
+    print("========== START EXAM ROUTE CALLED ==========")
 
     if "candidate_id" not in session:
 
@@ -146,17 +150,29 @@ def start_exam():
     #start face monitoring
 
     project_root = os.path.dirname(os.path.dirname(__file__))
+    command = [
+        sys.executable,
+        "-m",
+        "utils.face_monitor",
+        session["candidate_id"]
+    ]
+    print("Project root:", project_root)
+    print("Python executable:", sys.executable)
+    print("Command :", command)
+    try:
+        subprocess.Popen(
+            [
+                sys.executable,
+                "-m",
+                "utils.face_monitor",
+                session["candidate_id"]
+           ],
+           cwd=project_root
+        )
 
-    subprocess.Popen(
-        [
-            sys.executable,
-            "-m",
-            "utils.face_monitor"
-        ],
-        cwd=project_root
-    )
-
-    flash("Exam Started Successfully.")
+        print("Face monitoring started successfully.")
+    except Exception as e:
+        print("Error starting face monitoring:", e)
 
     return redirect(url_for("exam.exam_page"))
 
@@ -364,3 +380,58 @@ def end_exam():
     flash("Exam Ended Successfully.")
 
     return redirect(url_for("exam.exam_page"))
+
+ # ==========================================
+# Get Monitoring Status
+# ==========================================
+
+@exam.route("/get_monitoring_status")
+def get_monitoring_status():
+
+    connection = sqlite3.connect(DATABASE)
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+
+        SELECT
+
+            face_status,
+
+            face_absence_count
+
+        FROM MonitoringStatus
+
+        WHERE candidate_id = ?
+
+    """,
+
+    (
+
+        session["candidate_id"],
+
+    ))
+
+    data = cursor.fetchone()
+
+    connection.close()
+
+    if data:
+
+        return jsonify({
+
+            "face_status": data[0],
+
+            "face_absence_count": data[1]
+
+        })
+
+    return jsonify({
+
+        "face_status": "Unknown",
+
+        "face_absence_count": 0
+
+    })   
+
+

@@ -2,15 +2,24 @@ import cv2
 import sqlite3
 import time
 import os
+import sys
 
 from datetime import datetime
 from config import DATABASE
 
 
-# Candidate ID Temporary - will  come from Flask
+# ==========================================
+# Candidate ID received from Flask
+# ==========================================
 
+if len(sys.argv) > 1:
 
-candidate_id = "190"
+    candidate_id = sys.argv[1]
+    print("Face monitor started for candidate:", candidate_id)
+
+else:
+
+    candidate_id = "UNKNOWN"
 
 SCREENSHOT_FOLDER = "screenshots"
 os.makedirs(SCREENSHOT_FOLDER,exist_ok=True)
@@ -55,6 +64,90 @@ def log_event(event_type, remarks):
     connection.commit()
     connection.close()
 
+  # ==========================================
+# Update Monitoring Status
+# ==========================================
+
+def update_monitoring_status(
+    face_status,
+    absence_count
+):
+
+    connection = sqlite3.connect(DATABASE)
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+
+    INSERT OR REPLACE INTO MonitoringStatus
+    (
+
+        candidate_id,
+
+        face_status,
+
+        face_absence_count,
+
+        browser_status,
+
+        browser_focus_loss_count,
+
+        last_updated
+
+    )
+
+    VALUES
+    (
+        ?,
+        ?,
+        ?,
+        COALESCE(
+            (
+                SELECT browser_status
+
+                FROM MonitoringStatus
+
+                WHERE candidate_id=?
+            ),
+            'Browser Active'
+        ),
+
+        COALESCE(
+            (
+                SELECT browser_focus_loss_count
+
+                FROM MonitoringStatus
+
+                WHERE candidate_id=?
+            ),
+            0
+        ),
+
+        ?
+    )
+
+    """,
+
+    (
+
+        candidate_id,
+
+        face_status,
+
+        absence_count,
+
+        candidate_id,
+
+        candidate_id,
+
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    ))
+
+    connection.commit()
+
+    connection.close()  
+
 def capture_screenshot(frame):
 
     filename = f"{candidate_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
@@ -76,6 +169,7 @@ def capture_screenshot(frame):
 
 session_start_time = datetime.now()
 camera = cv2.VideoCapture(0)
+print("Camera opened:", camera.isOpened())
 
 if not camera.isOpened():
 
@@ -104,6 +198,7 @@ absence_duration = 0
 total_absence_duration = 0
 
 face_not_detected_count = 0
+face_absence_count = 0
 
 
 
@@ -171,6 +266,12 @@ while True:
             )
 
             previous_status = status
+            update_monitoring_status(
+                "Face Detected",
+                face_absence_count
+            )
+
+
 
     
     # Face Not Detected
@@ -185,6 +286,7 @@ while True:
         #face disappeared for first time
         if absence_start_time is None:
             absence_start_time = time.time()
+            face_absence_count += 1
 
             screenshot_path=capture_screenshot(frame)
 
@@ -206,8 +308,11 @@ while True:
             )
 
             previous_status = status
+            update_monitoring_status(
+                "Face Not Detected",
+                face_absence_count
+            )
 
-    
     # Draw Bounding Box
     
 
@@ -248,6 +353,7 @@ while True:
 
     #display current time
     current_time = datetime.now().strftime("%H:%M:%S")
+    
 
     cv2.putText(
         frame,
@@ -279,11 +385,9 @@ while True:
         (0, 255, 255),
         2
     )
-
+    
     
     # Display Webcam
-    
-
     cv2.imshow(
         "Continuous Face Monitoring",
         frame

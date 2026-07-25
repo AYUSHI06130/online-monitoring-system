@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Online Examination System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- =============================== -->
+    <!-- Header -->
+    <!-- =============================== -->
+
+    <header>
+
+        <h1>Online Examination Monitoring System</h1>
+
+    </header>
+
+    <!-- Flash Messages -->
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+
+            <div class="flash-container">
+
+                {% for message in messages %}
+
+                    <div class="message">
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+    {% endwith %}
+
+    <!-- =============================== -->
+    <!-- Main Dashboard -->
+    <!-- =============================== -->
+
+    <div class="dashboard">
+
+        <!-- ========================= -->
+        <!-- Left Panel -->
+        <!-- ========================= -->
+
+        <div class="left-panel">
+
+            <!-- Candidate Card -->
+
+            <div class="card">
+
+                <h2>Candidate Information</h2>
+
+                <hr>
+
+                <p>
+
+                    <strong>Name</strong>
+
+                    <span>{{ name }}</span>
+
+                </p>
+
+                <p>
+
+                    <strong>Candidate ID</strong>
+
+                    <span>{{ candidate_id }}</span>
+
+                </p>
+
+                <p>
+
+                    <strong>Exam Status</strong>
+
+                    <span>{{ status }}</span>
+
+                </p>
+
+            </div>
+
+            <!-- Session Card -->
+
+            <div class="card">
+
+                <h2>Session</h2>
+
+                <hr>
+
+                <p>
+
+                    <strong>Current Time</strong>
+
+                    <span id="current-time"></span>
+
+                </p>
+
+                <p>
+
+                    <strong>Session Timer</strong>
+
+                    <span id="session-timer">
+
+                        00:00:00
+
+                    </span>
+
+                </p>
+
+            </div>
+
+            <!-- Webcam Placeholder -->
+
+            <div class="card webcam-card">
+
+                <h2>Live Webcam</h2>
+
+                <hr>
+
+                <div class="webcam-placeholder">
+
+                    Webcam Preview
+
+                    <br><br>
+
+                    (OpenCV Window)
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ========================= -->
+        <!-- Right Panel -->
+        <!-- ========================= -->
+
+        <div class="right-panel">
+
+            <!-- Face Monitoring -->
+
+            <div class="card">
+
+                <h2>Face Monitoring</h2>
+
+                <hr>
+
+                <p>
+
+                    <strong>Face Status</strong>
+
+                    <span id="face-status">
+
+                        Face Detected
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Face Absence Count</strong>
+
+                    <span id="absence-count">
+
+                        0
+
+                    </span>
+
+                </p>
+
+            </div>
+
+            <!-- Browser Monitoring -->
+
+            <div class="card">
+
+                <h2>Browser Monitoring</h2>
+
+                <hr>
+
+                <p>
+
+                    <strong>Browser Status</strong>
+
+                    <span id="browser-status">
+
+                        Browser Active
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Focus Loss Count</strong>
+
+                    <span id="focus-count">
+
+                        0
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Last Focus Loss</strong>
+
+                    <span id="last-focus-time">
+
+                        --
+
+                    </span>
+
+                </p>
+
+            </div>
+
+            <!-- Controls -->
+
+            <div class="card">
+
+                <h2>Exam Controls</h2>
+
+                <hr>
+
+                <div class="button-grid">
+
+                    <a href="{{ url_for('exam.start_exam') }}">
+
+                        <button class="start-btn">
+
+                            Start Exam
+
+                        </button>
+
+                    </a>
+
+                    <a href="{{ url_for('exam.toggle_exam') }}">
+
+                        <button class="pause-btn">
+
+                            Pause / Resume
+
+                        </button>
+
+                    </a>
+
+                    <a href="{{ url_for('exam.end_exam') }}">
+
+                        <button class="end-btn">
+
+                            End Exam
+
+                        </button>
+
+                    </a>
+
+                    {% if exam_ended %}
+
+                    <a href="{{ url_for('auth.dashboard') }}">
+
+                        <button class="dashboard-btn">
+
+                            Dashboard
+
+                        </button>
+
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
