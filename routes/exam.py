@@ -10,9 +10,7 @@ from utils.camera_manager import CameraManager
 import sqlite3
 from datetime import datetime
 
-import subprocess
-import sys
-import os
+
 
 from config import DATABASE
 
@@ -26,7 +24,7 @@ exam = Blueprint("exam", __name__)
 # Camera Manager
 # ==========================================
 
-camera_manager = CameraManager()
+camera_manager = None
 
 
 # ==========================================
@@ -66,10 +64,20 @@ def get_latest_session(candidate_id):
 
 def generate_frames():
 
-    if not camera_manager.start_camera():
+    global camera_manager
+
+    if camera_manager is None:
         return
 
     while True:
+
+        latest = get_latest_session(camera_manager.candidate_id)
+
+        if latest is None:
+            break
+
+        if latest[1] != "Running":
+            break
 
         frame = camera_manager.get_frame()
 
@@ -88,7 +96,9 @@ def generate_frames():
             b'Content-Type: image/jpeg\r\n\r\n'
             + frame_bytes +
             b'\r\n'
-        )    
+        )
+
+    camera_manager.stop_camera()
 
 # ==========================================
 # Video Feed
@@ -153,6 +163,23 @@ def start_exam():
 
     candidate_id = session["candidate_id"]
 
+    #new update---------
+    global camera_manager
+
+    camera_manager = CameraManager(candidate_id)
+    print("CameraManager created")
+
+    opened = camera_manager.start_camera()
+
+    print("Camera opened:", opened)
+
+    if not opened:
+
+        flash("Unable to access webcam.")
+
+        return redirect(url_for("exam.exam_page"))
+    #---------------------    
+
     latest = get_latest_session(candidate_id)
 
     # --------------------------------------
@@ -201,32 +228,7 @@ def start_exam():
 
     connection.close()
 
-    #start face monitoring
-
-    project_root = os.path.dirname(os.path.dirname(__file__))
-    command = [
-        sys.executable,
-        "-m",
-        "utils.face_monitor",
-        session["candidate_id"]
-    ]
-    print("Project root:", project_root)
-    print("Python executable:", sys.executable)
-    print("Command :", command)
-    try:
-        subprocess.Popen(
-            [
-                sys.executable,
-                "-m",
-                "utils.face_monitor",
-                session["candidate_id"]
-           ],
-           cwd=project_root
-        )
-
-        print("Face monitoring started successfully.")
-    except Exception as e:
-        print("Error starting face monitoring:", e)
+    flash("exam started successfully")
 
     return redirect(url_for("exam.exam_page"))
 
@@ -430,6 +432,13 @@ def end_exam():
     connection.commit()
 
     connection.close()
+    global camera_manager
+
+    if camera_manager is not None:
+
+        camera_manager.stop_camera()
+
+        camera_manager = None
 
     flash("Exam Ended Successfully.")
 

@@ -1,16 +1,20 @@
 import cv2
 
+from utils.face_monitor import FaceMonitor
+
 
 class CameraManager:
 
-    def __init__(self):
+    def __init__(self, candidate_id):
 
         self.camera = None
+        self.candidate_id = candidate_id
 
+        self.face_monitor = FaceMonitor(candidate_id)
 
-    # -------------------------------
+    # ---------------------------------
     # Start Camera
-    # -------------------------------
+    # ---------------------------------
 
     def start_camera(self):
 
@@ -20,10 +24,9 @@ class CameraManager:
 
         return self.camera.isOpened()
 
-
-    # -------------------------------
+    # ---------------------------------
     # Get Frame
-    # -------------------------------
+    # ---------------------------------
 
     def get_frame(self):
 
@@ -37,55 +40,21 @@ class CameraManager:
 
             return None
 
+        frame = self.face_monitor.process_frame(frame)
+
         return frame
 
-
-    # -------------------------------
+    # ---------------------------------
     # Stop Camera
-    # -------------------------------
+    # ---------------------------------
 
     def stop_camera(self):
+
+        self.face_monitor.stop()
 
         if self.camera is not None:
 
             self.camera.release()
-
             self.camera = None
 
-
-# ===================================
-# Testing
-# ===================================
-
-if __name__ == "__main__":
-
-    manager = CameraManager()
-
-    if not manager.start_camera():
-
-        print("Unable to open webcam.")
-
-        exit()
-
-    print("Camera Started Successfully.")
-    print("Press Q to Exit.")
-
-    while True:
-
-        frame = manager.get_frame()
-
-        if frame is None:
-
-            break
-
-        cv2.imshow("Camera Manager Test", frame)
-
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-
-            break
-
-    manager.stop_camera()
-
-    cv2.destroyAllWindows()
-
-    print("Camera Closed.")
+        cv2.destroyAllWindows()

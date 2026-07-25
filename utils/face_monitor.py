@@ -2,416 +2,330 @@ import cv2
 import sqlite3
 import time
 import os
-import sys
 
 from datetime import datetime
 from config import DATABASE
 
 
-# ==========================================
-# Candidate ID received from Flask
-# ==========================================
+class FaceMonitor:
 
-if len(sys.argv) > 1:
+    def __init__(self, candidate_id):
 
-    candidate_id = sys.argv[1]
-    print("Face monitor started for candidate:", candidate_id)
+        self.candidate_id = candidate_id
 
-else:
+        self.SCREENSHOT_FOLDER = "screenshots"
+        os.makedirs(self.SCREENSHOT_FOLDER, exist_ok=True)
 
-    candidate_id = "UNKNOWN"
-
-SCREENSHOT_FOLDER = "screenshots"
-os.makedirs(SCREENSHOT_FOLDER,exist_ok=True)
-
-
-# Load Haar Cascade
-
-
-face_detector = cv2.CascadeClassifier(
-    cv2.data.haarcascades +
-    "haarcascade_frontalface_default.xml"
-)
-
-
-# Event Logger Function
-
-
-def log_event(event_type, remarks):
-
-    connection = sqlite3.connect(DATABASE)
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        INSERT INTO EventLog
-        (
-            candidate_id,
-            event_type,
-            timestamp,
-            remarks
+        self.face_detector = cv2.CascadeClassifier(
+            cv2.data.haarcascades +
+            "haarcascade_frontalface_default.xml"
         )
 
-        VALUES (?, ?, ?, ?)
-    """,
-    (
-        candidate_id,
-        event_type,
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        remarks
-    ))
+        self.previous_status = None
 
-    connection.commit()
-    connection.close()
+        self.absence_start_time = None
+        self.absence_duration = 0
+        self.total_absence_duration = 0
 
-  # ==========================================
-# Update Monitoring Status
-# ==========================================
+        self.face_not_detected_count = 0
+        self.face_absence_count = 0
 
-def update_monitoring_status(
-    face_status,
-    absence_count
-):
+        self.session_start_time = datetime.now()
 
-    connection = sqlite3.connect(DATABASE)
+    # --------------------------------------------------
 
-    cursor = connection.cursor()
+    def log_event(self, event_type, remarks):
 
-    cursor.execute("""
+        connection = sqlite3.connect(DATABASE)
 
-    INSERT OR REPLACE INTO MonitoringStatus
-    (
+        cursor = connection.cursor()
 
-        candidate_id,
-
-        face_status,
-
-        face_absence_count,
-
-        browser_status,
-
-        browser_focus_loss_count,
-
-        last_updated
-
-    )
-
-    VALUES
-    (
-        ?,
-        ?,
-        ?,
-        COALESCE(
+        cursor.execute(
+            """
+            INSERT INTO EventLog
             (
-                SELECT browser_status
+                candidate_id,
+                event_type,
+                timestamp,
+                remarks
+            )
 
-                FROM MonitoringStatus
-
-                WHERE candidate_id=?
-            ),
-            'Browser Active'
-        ),
-
-        COALESCE(
+            VALUES (?, ?, ?, ?)
+            """,
             (
-                SELECT browser_focus_loss_count
+                self.candidate_id,
+                event_type,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                remarks
+            )
+        )
 
-                FROM MonitoringStatus
+        connection.commit()
+        connection.close()
 
-                WHERE candidate_id=?
-            ),
-            0
-        ),
+    # --------------------------------------------------
 
-        ?
-    )
-
-    """,
-
-    (
-
-        candidate_id,
-
+    def update_monitoring_status(
+        self,
         face_status,
+        absence_count
+    ):
 
-        absence_count,
+        connection = sqlite3.connect(DATABASE)
 
-        candidate_id,
+        cursor = connection.cursor()
 
-        candidate_id,
+        cursor.execute(
+            """
+            INSERT OR REPLACE INTO MonitoringStatus
+            (
 
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                candidate_id,
 
-    ))
+                face_status,
 
-    connection.commit()
+                face_absence_count,
 
-    connection.close()  
+                browser_status,
 
-def capture_screenshot(frame):
+                browser_focus_loss_count,
 
-    filename = f"{candidate_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+                last_updated
 
-    filepath = os.path.join(
-        SCREENSHOT_FOLDER,
-        filename
-    )
-
-    cv2.imwrite(filepath, frame)
-
-    print(f"Screenshot Saved: {filepath}")
-
-    return filepath    
-
-
-
-# Open Webcam
-
-session_start_time = datetime.now()
-camera = cv2.VideoCapture(0)
-print("Camera opened:", camera.isOpened())
-
-if not camera.isOpened():
-
-    print("Unable to access webcam.")
-
-    exit()
-
-
-print(" Continuous Face Monitoring Started")
-print(" Press Q to Exit")
-
-
-
-# Stores Previous Status
-# Prevents Duplicate Logging
-
-previous_status = None
-
-# Tracks when face disappeared
-absence_start_time = None
-
-# Current absence duration
-absence_duration = 0
-
-# Total absence duration
-total_absence_duration = 0
-
-face_not_detected_count = 0
-face_absence_count = 0
-
-
-
-# Continuous Monitoring
-
-
-while True:
-
-    success, frame = camera.read()
-
-    if not success:
-
-        print("Unable to capture frame.")
-
-        break
-
-    
-    # Convert to Grayscale
-    
-
-    gray = cv2.cvtColor(
-        frame,
-        cv2.COLOR_BGR2GRAY
-    )
-
-    
-    # Detect Faces
-    
-
-    faces = face_detector.detectMultiScale(
-        gray,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(40, 40)
-    )
-
-    
-    # Face Detected
-
-
-    if len(faces) > 0:
-
-        status = "Face Detected"
-
-        color = (0, 255, 0)
-
-
-
-        #face has returned
-        if absence_start_time is not None:
-            total_absence = int(time.time() - absence_start_time)
-            total_absence_duration += total_absence
-            log_event(
-                "Face Returned",
-                f"Candidate returned after {total_absence} seconds"
-            )
-            absence_start_time = None
-            absence_duration = 0
-
-        if previous_status != status:
-
-            log_event(
-                "Face Detected",
-                "Candidate is visible"
             )
 
-            previous_status = status
-            update_monitoring_status(
-                "Face Detected",
-                face_absence_count
+            VALUES
+            (
+                ?,
+                ?,
+                ?,
+
+                COALESCE(
+                    (
+                        SELECT browser_status
+                        FROM MonitoringStatus
+                        WHERE candidate_id=?
+                    ),
+                    'Browser Active'
+                ),
+
+                COALESCE(
+                    (
+                        SELECT browser_focus_loss_count
+                        FROM MonitoringStatus
+                        WHERE candidate_id=?
+                    ),
+                    0
+                ),
+
+                ?
             )
-
-
-
-    
-    # Face Not Detected
-    
-
-    else:
-
-        status = "Face Not Detected"
-
-        color = (0, 0, 255)
-
-        #face disappeared for first time
-        if absence_start_time is None:
-            absence_start_time = time.time()
-            face_absence_count += 1
-
-            screenshot_path=capture_screenshot(frame)
-
-            log_event(
-                "Screenshot Captured",
-                screenshot_path
+            """,
+            (
+                self.candidate_id,
+                face_status,
+                absence_count,
+                self.candidate_id,
+                self.candidate_id,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
+        )
 
-        #calculate absence duration
-        absence_duration = int(time.time() - absence_start_time)
+        connection.commit()
+        connection.close()
 
-        if previous_status != status:
-            #increasing count by one
-            face_not_detected_count += 1
+    # --------------------------------------------------
 
-            log_event(
-                "Face Not Detected",
-                "Candidate left webcam"
-            )
+    def capture_screenshot(self, frame):
 
-            previous_status = status
-            update_monitoring_status(
-                "Face Not Detected",
-                face_absence_count
-            )
+        filename = (
+            f"{self.candidate_id}_"
+            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+        )
 
-    # Draw Bounding Box
-    
+        filepath = os.path.join(
+            self.SCREENSHOT_FOLDER,
+            filename
+        )
 
-    for (x, y, w, h) in faces:
+        cv2.imwrite(filepath, frame)
 
-        cv2.rectangle(
+        print("Screenshot Saved:", filepath)
+
+        return filepath
+
+    # --------------------------------------------------
+
+    def process_frame(self, frame):
+
+        gray = cv2.cvtColor(
             frame,
-            (x, y),
-            (x + w, y + h),
-            (0, 255, 0),
+            cv2.COLOR_BGR2GRAY
+        )
+
+        faces = self.face_detector.detectMultiScale(
+            gray,
+            scaleFactor=1.1,
+            minNeighbors=5,
+            minSize=(40, 40)
+        )
+
+        if len(faces) > 0:
+
+            status = "Face Detected"
+            color = (0, 255, 0)
+
+            if self.absence_start_time is not None:
+
+                total_absence = int(
+                    time.time() - self.absence_start_time
+                )
+
+                self.total_absence_duration += total_absence
+
+                self.log_event(
+                    "Face Returned",
+                    f"Candidate returned after {total_absence} seconds"
+                )
+
+                self.absence_start_time = None
+                self.absence_duration = 0
+
+            if self.previous_status != status:
+
+                self.log_event(
+                    "Face Detected",
+                    "Candidate is visible"
+                )
+
+                self.previous_status = status
+
+                self.update_monitoring_status(
+                    "Face Detected",
+                    self.face_absence_count
+                )
+
+        else:
+
+            status = "Face Not Detected"
+            color = (0, 0, 255)
+
+            if self.absence_start_time is None:
+
+                self.absence_start_time = time.time()
+
+                self.face_absence_count += 1
+
+                screenshot_path = self.capture_screenshot(frame)
+
+                self.log_event(
+                    "Screenshot Captured",
+                    screenshot_path
+                )
+
+            self.absence_duration = int(
+                time.time() - self.absence_start_time
+            )
+
+            if self.previous_status != status:
+
+                self.face_not_detected_count += 1
+
+                self.log_event(
+                    "Face Not Detected",
+                    "Candidate left webcam"
+                )
+
+                self.previous_status = status
+
+                self.update_monitoring_status(
+                    "Face Not Detected",
+                    self.face_absence_count
+                )
+
+        for (x, y, w, h) in faces:
+
+            cv2.rectangle(
+                frame,
+                (x, y),
+                (x + w, y + h),
+                (0, 255, 0),
+                2
+            )
+
+        cv2.putText(
+            frame,
+            status,
+            (20, 40),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            1,
+            color,
             2
         )
 
-    
-    # Display Status
-    
+        cv2.putText(
+            frame,
+            f"Candidate ID: {self.candidate_id}",
+            (20, 75),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (255, 255, 255),
+            2
+        )
 
-    cv2.putText(
-        frame,
-        status,
-        (20, 40),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        1,
-        color,
-        2
-    )
-    #displycandidate id 
+        current_time = datetime.now().strftime("%H:%M:%S")
 
-    cv2.putText(
-        frame,
-        f"Candidate ID: {candidate_id}",
-        (20, 75),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (255, 255, 255),
-        2
-    )
+        cv2.putText(
+            frame,
+            f"Current Time: {current_time}",
+            (20, 110),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 255, 255),
+            2
+        )
 
-    #display current time
-    current_time = datetime.now().strftime("%H:%M:%S")
-    
+        cv2.putText(
+            frame,
+            f"Absence Duration: {self.absence_duration} sec",
+            (20, 145),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (255, 255, 0),
+            2
+        )
 
-    cv2.putText(
-        frame,
-        f"Current Time: {current_time}",
-        (20, 110),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (0, 255, 255),
-        2
-    )
-    #display absence duration 
-    cv2.putText(
-        frame,
-        f"Absence Duration: {absence_duration} sec",
-        (20, 145),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (255, 255, 0),
-        2
-    )
+        cv2.putText(
+            frame,
+            f"Total Absence Duration: {self.total_absence_duration} sec",
+            (20, 180),
+            cv2.FONT_HERSHEY_SIMPLEX,
+            0.8,
+            (0, 255, 255),
+            2
+        )
 
-    #display total duration of absence
-    cv2.putText(
-        frame,
-        f"Total Absence Duration: {total_absence_duration} sec",
-        (20, 180),
-        cv2.FONT_HERSHEY_SIMPLEX,
-        0.8,
-        (0, 255, 255),
-        2
-    )
-    
-    
-    # Display Webcam
-    cv2.imshow(
-        "Continuous Face Monitoring",
-        frame
-    )
+        return frame
 
-    
-    # Exit on Q
-    
+    # --------------------------------------------------
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    def stop(self):
 
-        break
-
-
-# Close Webcam
-
-
-camera.release()
-
-cv2.destroyAllWindows()
-
-print("Monitoring Stopped Successfully.")
-print("Session Summary:")
-print(f"Session started at: {session_start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Session ended at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Total Absence Duration: {total_absence_duration} sec")
-print(f"Face Not Detected Count: {face_not_detected_count}")
+        print("Monitoring Stopped Successfully.")
+        print("Session Summary:")
+        print(
+            f"Session started at: "
+            f"{self.session_start_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        print(
+            f"Session ended at: "
+            f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        )
+        print(
+            f"Total Absence Duration: "
+            f"{self.total_absence_duration} sec"
+        )
+        print(
+            f"Face Not Detected Count: "
+            f"{self.face_not_detected_count}"
+        )
