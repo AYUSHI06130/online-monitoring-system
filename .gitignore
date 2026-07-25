@@ -14,6 +14,15 @@ logs/*.log
 # SQLite temporary files
 *.db-journal
 
+# Ignore actual SQLite database
+database/monitoring.db
+
+# Webcam uploads
+static/uploads/
+
+# Screenshots
+screenshots/
+
 # OS files
 Thumbs.db
 .DS_Store
