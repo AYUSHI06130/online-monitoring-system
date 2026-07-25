@@ -76,7 +76,9 @@ def generate_frames():
         if latest is None:
             break
 
-        if latest[1] != "Running":
+        # Stop streaming only after exam has ended
+
+        if latest[1] == "Ended":
             break
 
         frame = camera_manager.get_frame()
