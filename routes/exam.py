@@ -2,6 +2,10 @@ from flask import Blueprint, render_template, redirect, url_for
 from flask import send_from_directory
 from flask import flash, session
 from flask import request,jsonify,session
+from flask import Response
+import cv2
+
+from utils.camera_manager import CameraManager
 
 import sqlite3
 from datetime import datetime
@@ -17,6 +21,12 @@ from config import DATABASE
 # ==========================================
 
 exam = Blueprint("exam", __name__)
+
+# ==========================================
+# Camera Manager
+# ==========================================
+
+camera_manager = CameraManager()
 
 
 # ==========================================
@@ -50,6 +60,50 @@ def get_latest_session(candidate_id):
 
     return latest
 
+# ==========================================
+# Video Frame Generator
+# ==========================================
+
+def generate_frames():
+
+    if not camera_manager.start_camera():
+        return
+
+    while True:
+
+        frame = camera_manager.get_frame()
+
+        if frame is None:
+            break
+
+        success, buffer = cv2.imencode(".jpg", frame)
+
+        if not success:
+            continue
+
+        frame_bytes = buffer.tobytes()
+
+        yield (
+            b'--frame\r\n'
+            b'Content-Type: image/jpeg\r\n\r\n'
+            + frame_bytes +
+            b'\r\n'
+        )    
+
+# ==========================================
+# Video Feed
+# ==========================================
+
+@exam.route("/video_feed")
+def video_feed():
+
+    return Response(
+
+        generate_frames(),
+
+        mimetype="multipart/x-mixed-replace; boundary=frame"
+
+    )
 
 # ==========================================
 # Exam Page
