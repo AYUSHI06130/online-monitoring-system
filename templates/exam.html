@@ -1,228 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
 <head>
 
-
     <meta charset="UTF-8">
-
-
     <title>Online Examination</title>
-
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='css/style.css') }}">
 
-
 </head>
-
 
 <body>
 
-
-<div class="container">
-
-
-    <h1>Online Examination</h1>
-
-
-    <hr>
-
+<div class="dashboard-container">
 
     <!-- ========================================= -->
-    <!-- Flash Messages -->
+    <!-- Header -->
     <!-- ========================================= -->
 
+    <header class="dashboard-header">
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
+        <h1>Online Monitoring System</h1>
 
+    </header>
 
-                <div class="message">
-                    {{ message }}
-                </div>
-
-
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-
-    <!-- ========================================= -->
-    <!-- Exam Status -->
-    <!-- ========================================= -->
-
-
-    <h2>Current Status</h2>
-
-
-    <h3>{{ status }}</h3>
-
-
-    <hr>
-
-
-    <!-- ========================================= -->
-    <!-- Real-Time Monitoring Dashboard -->
-    <!-- ========================================= -->
-
-
-    <h2>Real-Time Monitoring Dashboard</h2>
-    <!-- Webcam Feed -->
-
-    <div class="webcam-container">
-
-        <h3>Live Webcam</h3>
-
-        <img
-            src="{{ url_for('exam.video_feed') }}"
-            id="video-feed"
-            alt="Live Webcam Feed">
-
-    </div>
-    <br>
     
 
-
-
-    <p>
-        <strong>Candidate Name:</strong>
-        {{ name }}
-    </p>
-
-
-    <p>
-        <strong>Candidate ID:</strong>
-        {{ candidate_id }}
-    </p>
-
-
-    <p>
-        <strong>Face Status:</strong>
-
-
-        <span id="face-status">
-            Face Detected
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Browser Status:</strong>
-
-
-        <span id="browser-status">
-            Browser Active
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Face Absence Count:</strong>
-
-
-        <span id="absence-count">
-            0
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Browser Focus Loss Count:</strong>
-
-
-        <span id="focus-count">
-            0
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Last Focus Loss:</strong>
-
-
-        <span id="last-focus-time">
-            --
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Current Date & Time:</strong>
-
-
-        <span id="current-time">
-        </span>
-    </p>
-
-
-    <p>
-        <strong>Session Timer:</strong>
-
-
-        <span id="session-timer">
-            00:00:00
-        </span>
-    </p>
-
-
-    <hr>
-
-
     <!-- ========================================= -->
-    <!-- Exam Controls -->
+    <!-- Top Information -->
     <!-- ========================================= -->
 
+    <section class="top-section">
 
-    <a href="{{ url_for('exam.start_exam') }}">
-        <button>Start Exam</button>
-    </a>
+        <!-- Left -->
+
+        <div class="candidate-card">
+
+            <h2>Candidate Information</h2>
+
+            <p>
+                <strong>Candidate Name :</strong>
+                {{ name }}
+            </p>
+
+            <p>
+                <strong>Candidate ID :</strong>
+                {{ candidate_id }}
+            </p>
+
+        </div>
+
+        <!-- Right -->
+
+        <div class="session-card">
+
+            <h2>Exam Session</h2>
+
+            <div class="session-info">
+                <div class="session-item">
+                    <h3>Current Date & Time</h3>
+                    <p id="current-time"></p>
+                </div>
+                <div class="session-item">
+                    <h3>Session Timer</h3>
+                    <p id="session-timer"></p>
+                </div>
+
+                
+
+        </div>
+
+    </section>
+
+    
+
+    <!-- ========================================= -->
+    <!-- Main Dashboard -->
+    <!-- ========================================= -->
+
+    <section class="main-dashboard">
+
+        <!-- Left Side -->
+
+        <div class="monitoring-panel">
+            <!---current status-->
+            
+            <div class="status-bar">
+                <strong>Current Status</strong>
 
 
-    <br><br>
+                
+                <span id="exam-status">
+                    {{session_status}}
+                </span>
+                        
+            </div>
+
+            <!-- Face -->
+
+            <div class="monitor-card">
+
+                <h2>Face Monitoring</h2>
+
+                <p>
+
+                    <strong>Face Status :</strong>
+
+                    <span id="face-status">
+
+                        Face Detected
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Face Absence Count :</strong>
+
+                    <span id="absence-count">
+
+                        0
+
+                    </span>
+
+                </p>
+
+            </div>
+
+            <!-- Browser -->
+
+            <div class="monitor-card">
+
+                <h2>Browser Monitoring</h2>
+
+                <p>
+
+                    <strong>Browser Status :</strong>
+
+                    <span id="browser-status">
+
+                        Browser Active
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Focus Loss Count :</strong>
+
+                    <span id="focus-count">
+
+                        0
+
+                    </span>
+
+                </p>
+
+                <p>
+
+                    <strong>Last Focus Loss :</strong>
+
+                    <span id="last-focus-time">
+
+                        --
+
+                    </span>
+
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- Webcam -->
+
+        <div class="webcam-panel">
+            <h2>Live Webcam</h2>
+
+            <div class="webcam-container">
+
+                <img
+                    src="{{ url_for('exam.video_feed') }}"
+                    class="webcam-feed"
+                    alt="Live Webcam">
+
+                <section class="button-panel">
+
+                    <a href="{{ url_for('exam.start_exam') }}">
+                        <button class="control-btn">
+                            Start Exam
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('exam.toggle_exam') }}">
+                        <button class="control-btn">
+                            Pause / Resume
+                        </button>
+                    </a>
+
+                    <a href="{{ url_for('exam.end_exam') }}">
+                        <button class="control-btn">
+                            End Exam
+                        </button>
+                    </a>
+
+                    {% if exam_ended %}
+
+                    <a href="{{ url_for('auth.dashboard') }}">
+                        <button class="control-btn">
+                            Back to Dashboard
+                        </button>
+                    </a>
+
+                    {% endif %}
+
+                </section>
+
+            </div>
 
 
-    <a href="{{ url_for('exam.toggle_exam') }}">
-        <button>Pause / Resume</button>
-    </a>
+        </div>
 
+    </section>
 
-    <br><br>
-
-
-    <a href="{{ url_for('exam.end_exam') }}">
-        <button>End Exam</button>
-    </a>
-
-
-    <br><br>
-
-
-    {% if exam_ended %}
-
-
-        <a href="{{ url_for('auth.dashboard') }}">
-            <button>Back to Dashboard</button>
-        </a>
-
-
-    {% endif %}
-
+    
 
 </div>
 
-
-<!-- ========================================= -->
-<!-- JavaScript -->
-<!-- ========================================= -->
-
-
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
-
 </body>
-
 
 </html>

@@ -196,13 +196,19 @@ function updateFaceMonitoring() {
 
         .then(data => {
 
+            // Face Monitoring
             document.getElementById("face-status").innerText =
                 data.face_status;
 
             document.getElementById("absence-count").innerText =
                 data.face_absence_count;
-            
-            updateSessionTimer(data.elapsed_seconds);    
+
+            // Session Timer
+            updateSessionTimer(data.elapsed_seconds);
+
+            // Current Status  ← ADD THIS
+            document.getElementById("exam-status").innerText =
+                data.session_status;
 
         })
 

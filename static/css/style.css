@@ -1,239 +1,602 @@
-/* ==========================
-   Google Font
-========================== */
+/* ==========================================================
+   GOOGLE FONT
+========================================================== */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+/* ==========================================================
+   GLOBAL
+========================================================== */
 
-
-/* ==========================
-   General Styling
-========================== */
-
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #ffe4ec, #ffd6e7, #fff0f5);
-    margin: 0;
-    padding: 0;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Poppins",sans-serif;
 }
 
+body{
 
-/* ==========================
-   Container
-========================== */
+    background:#FFF8FB;
 
+    color:#444;
 
-.container {
-    width: 420px;
-    margin: 60px auto;
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(255, 105, 180, 0.2);
-    transition: 0.3s;
+    padding:12px 18px;
+
 }
 
+/* ==========================================================
+   MAIN CONTAINER
+========================================================== */
 
-.container:hover {
-    transform: translateY(-3px);
-}
+.dashboard-container{
 
-
-/* ==========================
-   Headings
-========================== */
-
-
-h1,
-h2,
-h3 {
-    color: #d63384;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-
-/* ==========================
-   Labels
-========================== */
-
-
-label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 6px;
-    font-weight: 500;
-    color: #b03060;
-}
-
-
-/* ==========================
-   Input Fields
-========================== */
-
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="file"] {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #ffc0cb;
-    border-radius: 12px;
-    box-sizing: border-box;
-    font-size: 15px;
-    outline: none;
-    transition: 0.3s;
-}
-
-
-input:focus {
-    border-color: #ff69b4;
-    box-shadow: 0 0 8px rgba(255,105,180,0.3);
-}
-
-
-/* ==========================
-   Buttons
-========================== */
-
-
-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 22px;
-    background: linear-gradient(45deg, #ff69b4, #ff85c1);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-
-button:hover {
-    transform: scale(1.03);
-    background: linear-gradient(45deg, #ff4fa2, #ff6fb5);
-}
-
-
-/* ==========================
-   Links
-========================== */
-
-
-a {
-    color: #d63384;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-
-a:hover {
-    color: #ff1493;
-    text-decoration: underline;
-}
-
-
-/* ==========================
-   Paragraphs
-========================== */
-
-
-p {
-    text-align: center;
-    color: #555;
-}
-
-
-/* ==========================
-   Flash Messages
-========================== */
-
-
-.message {
-    background: #ffe6f0;
-    border-left: 6px solid #ff69b4;
-    color: #c2185b;
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    font-weight: 500;
-}
-
-
-/* ==========================
-   Horizontal Line
-========================== */
-
-
-hr {
-    border: none;
-    height: 2px;
-    background: #ffd1dc;
-    margin: 20px 0;
-}
-
-
-/* ==========================
-   File Upload
-========================== */
-
-
-input[type="file"] {
-    background: #fff7fa;
-}
-
-
-/* ==========================
-   Small Animation
-========================== */
-
-
-.container {
-    animation: fadeIn 0.7s ease;
-}
-
-
-@keyframes fadeIn {
-
-
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-
-.webcam-container{
-
-    width:640px;
+    max-width:1550px;
 
     margin:auto;
 
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.dashboard-header{
+
+    background:#F4C4D8;
+
+    color:#8E3D62;
+
+    padding:12px 20px;
+
+    border-radius:18px;
+
     text-align:center;
+
+    margin-bottom:10px;
+
+    box-shadow:0 8px 22px rgba(226,160,189,.25);
 
 }
 
-#video-feed{
+.dashboard-header h1{
 
-    width:640px;
+    font-size:30px;
 
-    height:480px;
+    font-weight:600;
 
-    border:3px solid #4CAF50;
+}
+
+/* ==========================================================
+   FLASH MESSAGE
+========================================================== */
+
+.message{
+
+    background:#FFE9F1;
+
+    color:#B85080;
+
+    border:1px solid #F7C8DB;
+
+    padding:12px;
+
+    border-radius:14px;
+
+    margin-bottom:12px;
+
+    text-align:center;
+
+    font-weight:500;
+
+}
+
+/* ==========================================================
+   TOP SECTION
+========================================================== */
+
+.top-section{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+
+    margin-bottom:10px;
+
+}
+
+.candidate-card,
+
+.session-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:18px;
+
+    padding:12px 18px;
+
+    min-height:85px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+.candidate-card h2,
+
+.session-card h2{
+
+    color:#C76190;
+
+    font-size:20px;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.candidate-card p,
+
+.session-card p{
+
+    margin:4px 0;
+
+    font-size:15px;
+
+    line-height:1.4;
+
+}
+
+/* ===========================================
+   Session Layout
+=========================================== */
+
+.session-info{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:25px;
+
+    margin-top:10px;
+
+}
+
+.session-item{
+
+    flex:1;
+
+}
+
+.session-item h3{
+
+    font-size:18px;
+
+    margin-bottom:8px;
+
+    color:#444;
+
+}
+
+.session-item p{
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    color:#c85d93;
+
+}
+
+/* ==========================================================
+   STATUS BAR
+========================================================== */
+
+.status-bar{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-left:5px solid #E58CB2;
+
+    border-radius:16px;
+
+    padding:16px 22px;
+
+    margin-bottom:12px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:22px;
+
+    font-weight:600;
+
+    color:#3F3F46;
+
+}
+
+.status-bar strong{
+
+    color:#2F2F2F;
+
+}
+
+#exam-status{
+
+    color:#D06096;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   MAIN DASHBOARD
+========================================================== */
+
+.main-dashboard{
+
+    display:grid;
+
+    grid-template-columns:30% 70%;
+
+    gap:12px;
+
+    align-items:start;
+
+}
+
+/* ==========================================================
+   LEFT PANEL
+========================================================== */
+
+.monitoring-panel{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.monitor-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:18px;
+
+    padding:12px 18px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+.monitor-card h2{
+
+    color:#C76190;
+
+    font-size:20px;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+}
+
+.monitor-card p{
+
+    margin:4px 0;
+
+    font-size:15px;
+
+    line-height:1.45;
+
+}
+
+/* ==========================================================
+   WEBCAM
+========================================================== */
+
+.webcam-panel{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:18px;
+
+    padding:14px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+/* Holds webcam + buttons */
+
+
+
+.webcam-panel h2{
+
+    color:#C76190;
+
+    text-align:center;
+
+    font-size:22px;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+}
+
+.webcam-container{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:center;
+
+    gap:50px;
+
+}
+
+.webcam-feed{
+
+    width:420px;
+    height:300px;
+
+    object-fit: contain;
+    background: black;
+
+    border-radius:16px;
+
+    border:3px solid #F1B8CF;
+
+    background:#000;
+
+    flex-shrink:0;
+
+}
+/* ==========================================================
+   BUTTON PANEL
+========================================================== */
+
+.button-panel{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:flex-start;
+
+    align-items:center;
+
+    gap:18px;
+
+    margin-top:0;
+
+    min-width:220px;
+
+}
+
+.button-panel a{
+
+    text-decoration:none;
+
+}
+
+.control-btn{
+
+    width:210px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#E58CB2;
+
+    color:#FFFFFF;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 6px 15px rgba(224,145,183,.35);
+
+}
+
+.control-btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 20px rgba(224,145,183,.45);
+
+}
+
+.control-btn:active{
+
+    transform:scale(.97);
+
+}
+
+/* ==========================================================
+   STATUS TEXT
+========================================================== */
+
+#face-status,
+#browser-status,
+#session-timer{
+
+    color:#C76190;
+
+    font-weight:600;
+
+}
+
+#absence-count,
+#focus-count{
+
+    color:#B54F7F;
+
+    font-weight:600;
+
+}
+
+#current-time{
+
+    color:#555;
+
+    font-weight:500;
+
+}
+
+#last-focus-time{
+
+    color:#666;
+
+}
+
+/* ==========================================================
+   SMOOTH CARD HOVER
+========================================================== */
+
+.candidate-card:hover,
+.session-card:hover,
+.monitor-card:hover,
+.webcam-panel:hover{
+
+    transform:translateY(-2px);
+
+    transition:.25s;
+
+    box-shadow:0 10px 24px rgba(228,170,196,.22);
+
+}
+
+/* ==========================================================
+   SCROLLBAR
+========================================================== */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#FFF3F8;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#E7A8C3;
 
     border-radius:10px;
 
-    background:black;
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#D884A8;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:1200px){
+
+    .main-dashboard{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .webcam-feed{
+
+        height:320px;
+
+    }
+
+}
+
+@media(max-width:900px){
+
+    .top-section{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .button-panel{
+
+        flex-direction:column;
+
+    }
+
+    .control-btn{
+
+        width:100%;
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    body{
+
+        padding:10px;
+
+    }
+
+    .dashboard-header h1{
+
+        font-size:24px;
+
+    }
+
+    .candidate-card,
+    .session-card,
+    .monitor-card,
+    .webcam-panel{
+
+        padding:12px;
+
+    }
+
+    .webcam-feed{
+
+        height:240px;
+
+    }
 
 }
