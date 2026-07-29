@@ -1,17 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
+    <meta charset="UTF-8">
+
     <title>Exam Result</title>
+
 </head>
 
 <body>
 
-<h1>Exam Completed</h1>
+    <h1>Exam Completed Successfully</h1>
 
-<h2>Integrity Score : {{ score }}</h2>
+    <hr>
 
-<h2>Risk Level : {{ risk }}</h2>
+    <h2>Integrity Report</h2>
+
+    <p><strong>Integrity Score :</strong> {{ score }}/100</p>
+
+    <p><strong>Risk Level :</strong> {{ risk }}</p>
+
+    <hr>
+
+    <h2>Monitoring Summary</h2>
+
+    <p><strong>Face Absence Count :</strong> {{ face_absence_count }}</p>
+
+    <p><strong>Browser Focus Lost Count :</strong> {{ browser_loss_count }}</p>
+
+    <p><strong>Total Suspicious Events :</strong> {{ total_events }}</p>
+
+    <hr>
+
+    <!-- Back to Dashboard Button -->
+    <a href="{{ url_for('auth.dashboard') }}">
+        <button>
+            Back to Dashboard
+        </button>
+    </a>
 
 </body>
 

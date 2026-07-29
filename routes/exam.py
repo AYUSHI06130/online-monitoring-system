@@ -446,7 +446,7 @@ def toggle_exam():
     connection.commit()
     connection.close()
 
-    return redirect(url_for("exam.exam_page"))
+    return jsonify({"status": "success"})
 
 
 # ==========================================
@@ -518,10 +518,49 @@ def end_exam():
 
     candidate_id = session["candidate_id"]
 
-    score, risk = calculate_integrity_score(
+    result = calculate_integrity_score(
         candidate_id,
         session_id
     )
+
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM EventLog
+        WHERE candidate_id=?
+        AND session_id=?
+        AND event_type='Face Not Detected'
+    """, (session["candidate_id"], session_id))
+
+    face_absence_count = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM EventLog
+        WHERE candidate_id=?
+        AND session_id=?
+        AND event_type='Browser Focus Lost'
+    """, (session["candidate_id"], session_id))
+
+    browser_loss_count = cursor.fetchone()[0]
+
+    # Total Suspicious Events
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM EventLog
+    WHERE candidate_id=?
+    AND session_id=?
+    """,
+    (
+        candidate_id,
+        session_id
+    ))
+
+    total_events = cursor.fetchone()[0]
+
+    connection.close()
     global camera_manager
 
     if camera_manager is not None:
@@ -534,8 +573,11 @@ def end_exam():
 
     return render_template(
         "result.html",
-        score=score,
-        risk=risk
+        score=result["score"],
+        risk=result["risk"],
+        face_absence_count=face_absence_count,
+        browser_loss_count=browser_loss_count,
+        total_events=total_events
     )
 
 # ==========================================

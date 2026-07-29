@@ -194,12 +194,23 @@
                             Start Exam
                         </button>
                     </a>
-
-                    <a href="{{ url_for('exam.toggle_exam') }}">
+                    <!-- cooment in if doesnt worl -->
+                    <!--<a href="{{ url_for('exam.toggle_exam') }}">
                         <button class="control-btn">
                             Pause / Resume
                         </button>
-                    </a>
+                    </a>-->
+                    <!--removve and considerupper one if not working-->
+                    <button
+                        class="control-btn"
+                        id="toggle-btn"
+                        onclick="toggleExam()">
+
+                        Pause / Resume
+
+                    </button>
+
+
 
                     <a href="{{ url_for('exam.end_exam') }}">
                         <button class="control-btn">
@@ -207,16 +218,7 @@
                         </button>
                     </a>
 
-                    {% if exam_ended %}
-
-                    <a href="{{ url_for('auth.dashboard') }}">
-                        <button class="control-btn">
-                            Back to Dashboard
-                        </button>
-                    </a>
-
-                    {% endif %}
-
+                    
                 </section>
 
             </div>

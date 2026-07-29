@@ -223,3 +223,26 @@ function updateFaceMonitoring() {
 setInterval(updateFaceMonitoring, 500);
 
 updateFaceMonitoring();
+
+
+function toggleExam() {
+
+    fetch("/toggle_exam")
+
+        .then(response => {
+
+            if (response.ok) {
+
+                updateFaceMonitoring();
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.log(error);
+
+        });
+
+}

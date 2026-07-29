@@ -28,6 +28,28 @@ def calculate_integrity_score(candidate_id, session_id):
 
     events = cursor.fetchall()
 
+
+    # Face absence count
+    cursor.execute("""
+    SELECT face_absence_count
+    FROM MonitoringStatus
+    WHERE candidate_id=?
+    """, (candidate_id,))
+
+    row = cursor.fetchone()
+
+    face_absence_count = row[0] if row else 0
+
+    cursor.execute("""
+    SELECT COUNT(*)
+    FROM EventLog
+    WHERE candidate_id=?
+    AND session_id=?
+    AND event_type='Browser Focus Lost'
+    """, (candidate_id, session_id))
+
+    browser_loss_count = cursor.fetchone()[0]
+
     score = 100
 
     for event in events:
@@ -80,4 +102,10 @@ def calculate_integrity_score(candidate_id, session_id):
     conn.commit()
     conn.close()
 
-    return score, risk
+    return {
+        "score": score,
+        "risk": risk,
+        "face_absence_count": face_absence_count,
+        "browser_loss_count": browser_loss_count,
+        "total_events": total_events
+    }
