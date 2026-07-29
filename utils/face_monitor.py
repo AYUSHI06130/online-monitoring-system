@@ -40,20 +40,38 @@ class FaceMonitor:
 
         cursor = connection.cursor()
 
+        cursor.execute("""
+            SELECT session_id
+            FROM Session
+            WHERE candidate_id = ?
+            ORDER BY session_id DESC
+            LIMIT 1
+        """, (self.candidate_id,))
+
+        result = cursor.fetchone()
+
+        if result is None:
+            connection.close()
+            return
+
+        session_id = result[0]
+
         cursor.execute(
             """
             INSERT INTO EventLog
             (
                 candidate_id,
+                session_id,
                 event_type,
                 timestamp,
                 remarks
             )
 
-            VALUES (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?,?)
             """,
             (
                 self.candidate_id,
+                session_id,
                 event_type,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 remarks

@@ -6,6 +6,7 @@ from flask import Response
 import cv2
 
 from utils.camera_manager import CameraManager
+from utils.integrity_score import calculate_integrity_score
 
 import sqlite3
 from datetime import datetime
@@ -228,9 +229,36 @@ def start_exam():
 
     connection.commit()
 
+    # Save the Session table record
+    connection.commit()
+
+    # Get the newly created session_id
+    session_id = cursor.lastrowid
+
+    # Log Exam Started event
+    cursor.execute("""
+    INSERT INTO EventLog
+    (
+        candidate_id,
+        session_id,
+        event_type,
+        timestamp,
+        remarks
+    )
+    VALUES (?, ?, ?, ?, ?)
+    """,
+    (
+        candidate_id,
+        session_id,
+        "Exam Started",
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Candidate started the exam"
+    ))
+
+    connection.commit()
     connection.close()
 
-    flash("exam started successfully")
+    flash("Exam started successfully")
 
     return redirect(url_for("exam.exam_page"))
 
@@ -242,9 +270,17 @@ def start_exam():
 def log_browser_event():
 
     candidate_id = session.get("candidate_id")
+    
 
     if candidate_id is None:
         return jsonify({"status": "error"}), 401
+
+    latest = get_latest_session(candidate_id)
+
+    if latest is None:
+        return jsonify({"status": "error", "message": "No active session"}), 400
+
+    session_id = latest[0]    
 
     data = request.get_json()
 
@@ -258,15 +294,17 @@ def log_browser_event():
         INSERT INTO EventLog
         (
             candidate_id,
+            session_id,
             event_type,
             timestamp,
             remarks
         )
 
-        VALUES (?, ?, ?, ?)
+        VALUES (?, ?, ?, ?,?)
     """,
     (
         candidate_id,
+        session_id,
         event_type,
         datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         remarks
@@ -473,6 +511,17 @@ def end_exam():
     connection.commit()
 
     connection.close()
+
+    # ------------------------------------
+    # Calculate Integrity Score
+    # ------------------------------------
+
+    candidate_id = session["candidate_id"]
+
+    score, risk = calculate_integrity_score(
+        candidate_id,
+        session_id
+    )
     global camera_manager
 
     if camera_manager is not None:
@@ -483,9 +532,13 @@ def end_exam():
 
     flash("Exam Ended Successfully.")
 
-    return redirect(url_for("exam.exam_page"))
+    return render_template(
+        "result.html",
+        score=score,
+        risk=risk
+    )
 
- # ==========================================
+# ==========================================
 # Get Monitoring Status
 # ==========================================
 
@@ -677,3 +730,31 @@ def get_monitoring_status():
         "elapsed_seconds": max(elapsed_seconds, 0)
 
     })
+
+@exam.route("/scores")
+def view_scores():
+
+    connection = sqlite3.connect(DATABASE)
+
+    connection.row_factory = sqlite3.Row
+
+    cursor = connection.cursor()
+
+    cursor.execute("""
+
+        SELECT *
+
+        FROM IntegrityScore
+
+        ORDER BY calculated_at DESC
+
+    """)
+
+    scores = cursor.fetchall()
+
+    connection.close()
+
+    return render_template(
+        "scores.html",
+        scores=scores
+    )    

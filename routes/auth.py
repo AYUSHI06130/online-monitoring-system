@@ -175,19 +175,7 @@ def login():
             session["name"] = user[1]
             session["email"] = user[2]
 
-            cursor.execute("""
-            INSERT INTO EventLog
-            (candidate_id,event_type,timestamp,remarks)
-            VALUES(?,?,?,?)
-            """,
-
-            (
-                session["candidate_id"],
-                "Exam Started",
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                "Candidate Logged In"
-            ))
-            connection.commit()
+            
             connection.close()
 
             flash("Login Successful!")

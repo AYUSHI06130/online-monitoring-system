@@ -50,6 +50,10 @@ CREATE TABLE IF NOT EXISTS Session(
 
     status TEXT,
 
+    paused_at TEXT,
+
+    total_pause_seconds INTEGER DEFAULT 0,
+
     FOREIGN KEY(candidate_id)
     REFERENCES Candidate(candidate_id)
 
@@ -67,6 +71,8 @@ CREATE TABLE IF NOT EXISTS EventLog(
     event_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
     candidate_id TEXT NOT NULL,
+
+    session_id INTEGER NOT NULL,
 
     event_type TEXT NOT NULL,
 
@@ -107,6 +113,26 @@ CREATE TABLE IF NOT EXISTS MonitoringStatus(
 
 )
 
+""")
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS IntegrityScore(
+
+    score_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    candidate_id TEXT NOT NULL,
+
+    session_id INTEGER,
+
+    final_score INTEGER,
+
+    risk_level TEXT,
+
+    total_events INTEGER,
+
+    calculated_at TEXT
+
+)
 """)
 
 connection.commit()
