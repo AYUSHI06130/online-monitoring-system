@@ -80,6 +80,8 @@ CREATE TABLE IF NOT EXISTS EventLog(
 
     remarks TEXT,
 
+    screenshot_path TEXT,
+
     FOREIGN KEY(candidate_id)
     REFERENCES Candidate(candidate_id)
 

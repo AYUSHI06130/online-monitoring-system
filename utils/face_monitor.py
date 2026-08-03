@@ -34,7 +34,7 @@ class FaceMonitor:
 
     # --------------------------------------------------
 
-    def log_event(self, event_type, remarks):
+    def log_event(self, event_type, remarks, screenshot_path=None):
 
         connection = sqlite3.connect(DATABASE)
 
@@ -64,17 +64,19 @@ class FaceMonitor:
                 session_id,
                 event_type,
                 timestamp,
-                remarks
+                remarks,
+                screenshot_path
             )
 
-            VALUES (?, ?, ?, ?,?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
             (
                 self.candidate_id,
                 session_id,
                 event_type,
                 datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                remarks
+                remarks,
+                screenshot_path
             )
         )
 
@@ -156,22 +158,26 @@ class FaceMonitor:
 
     def capture_screenshot(self, frame):
 
+        candidate_folder = os.path.join(
+            "screenshots",
+            f"Candidate_{self.candidate_id}"
+        )
+
+        os.makedirs(candidate_folder, exist_ok=True)
+
         filename = (
-            f"{self.candidate_id}_"
-            f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
+            f"face_missing_"
+            f"{datetime.now().strftime('%H-%M-%S')}.png"
         )
 
         filepath = os.path.join(
-            self.SCREENSHOT_FOLDER,
+            candidate_folder,
             filename
         )
 
         cv2.imwrite(filepath, frame)
 
-        print("Screenshot Saved:", filepath)
-
         return filepath
-
     # --------------------------------------------------
 
     def process_frame(self, frame):
@@ -237,7 +243,8 @@ class FaceMonitor:
                 screenshot_path = self.capture_screenshot(frame)
 
                 self.log_event(
-                    "Screenshot Captured",
+                    "Face Not Detected",
+                    "Candidate left webcam",
                     screenshot_path
                 )
 
