@@ -21,7 +21,7 @@ database/monitoring.db
 static/uploads/
 
 # Screenshots
-screenshots/
+evidence/
 
 # OS files
 Thumbs.db
