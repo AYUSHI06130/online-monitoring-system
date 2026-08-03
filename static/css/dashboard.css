@@ -1,0 +1,378 @@
+/* ==========================================================
+   GLOBAL
+========================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+body{
+
+    background:#FFF7FA;
+
+    padding:25px;
+
+    color:#333;
+
+}
+
+
+/* ==========================================================
+   WRAPPER
+========================================================== */
+
+.dashboard-wrapper{
+
+    max-width:1400px;
+
+    margin:auto;
+
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.dashboard-header{
+
+    background:#F4C5DA;
+
+    color:#8B3F68;
+
+    text-align:center;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    margin-bottom:22px;
+
+    box-shadow:0 8px 20px rgba(228,170,196,.20);
+
+}
+
+.dashboard-header h1{
+
+    font-size:38px;
+
+    font-weight:700;
+
+}
+
+
+/* ==========================================================
+   FLASH MESSAGE
+========================================================== */
+
+.message{
+
+    background:#FFEAF2;
+
+    border:1px solid #F3C8DA;
+
+    color:#B64A78;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    margin-bottom:18px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}
+
+
+/* ==========================================================
+   WELCOME CARD
+========================================================== */
+
+.welcome-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:20px;
+
+    padding:28px;
+
+    margin-bottom:22px;
+
+    text-align:center;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+.welcome-card h2{
+
+    color:#C76190;
+
+    font-size:30px;
+
+    margin-bottom:10px;
+
+}
+
+.welcome-card p{
+
+    font-size:17px;
+
+    color:#666;
+
+}
+
+
+/* ==========================================================
+   TWO COLUMN GRID
+========================================================== */
+
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:22px;
+
+    margin-bottom:22px;
+
+}
+
+
+/* ==========================================================
+   CARDS
+========================================================== */
+
+.dashboard-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:20px;
+
+    padding:28px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+.dashboard-card h2{
+
+    color:#C76190;
+
+    margin-bottom:20px;
+
+    font-size:26px;
+
+}
+
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+td{
+
+    padding:12px 0;
+
+    border-bottom:1px solid #F5DCE7;
+
+    font-size:16px;
+
+}
+
+td:first-child{
+
+    width:42%;
+
+    color:#555;
+
+    font-weight:600;
+
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.dashboard-card a{
+
+    text-decoration:none;
+
+}
+
+.action-btn,
+
+.logout-btn{
+
+    width:100%;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:14px;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    margin-bottom:18px;
+
+}
+
+
+/* Start Exam */
+
+.action-btn{
+
+    background:#E58CB2;
+
+    color:white;
+
+    box-shadow:0 6px 18px rgba(224,145,183,.35);
+
+}
+
+.action-btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-2px);
+
+}
+
+
+/* Logout */
+
+.logout-btn{
+
+    background:#FFE3EC;
+
+    color:#C76190;
+
+    border:2px solid #E58CB2;
+
+}
+
+.logout-btn:hover{
+
+    background:#FAD2E2;
+
+}
+
+
+/* ==========================================================
+   INSTRUCTION CARD
+========================================================== */
+
+.instruction-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:20px;
+
+    padding:30px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+.instruction-card h2{
+
+    color:#C76190;
+
+    margin-bottom:20px;
+
+    font-size:28px;
+
+}
+
+.instruction-card ul{
+
+    padding-left:24px;
+
+}
+
+.instruction-card li{
+
+    margin-bottom:12px;
+
+    line-height:1.7;
+
+    font-size:16px;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:1000px){
+
+    .dashboard-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    body{
+
+        padding:14px;
+
+    }
+
+    .dashboard-header h1{
+
+        font-size:30px;
+
+    }
+
+    .welcome-card h2{
+
+        font-size:24px;
+
+    }
+
+    .dashboard-card{
+
+        padding:22px;
+
+    }
+
+    .instruction-card{
+
+        padding:22px;
+
+    }
+
+}

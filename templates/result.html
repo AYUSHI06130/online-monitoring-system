@@ -7,38 +7,122 @@
 
     <title>Exam Result</title>
 
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static',filename='css/result.css') }}">
+
 </head>
 
 <body>
 
-    <h1>Exam Completed Successfully</h1>
+<div class="container">
 
-    <hr>
+    <h1>Online Examination Integrity Report</h1>
 
-    <h2>Integrity Report</h2>
+    <!-- Candidate Information -->
+    <div class="card">
 
-    <p><strong>Integrity Score :</strong> {{ score }}/100</p>
+        <h2>Candidate Information</h2>
 
-    <p><strong>Risk Level :</strong> {{ risk }}</p>
+        <p><strong>Candidate ID :</strong> {{ candidate_id }}</p>
 
-    <hr>
+        <p><strong>Candidate Name :</strong> {{ candidate_name }}</p>
 
-    <h2>Monitoring Summary</h2>
+    </div>
 
-    <p><strong>Face Absence Count :</strong> {{ face_absence_count }}</p>
+    <!-- Session Information -->
+    <div class="card">
 
-    <p><strong>Browser Focus Lost Count :</strong> {{ browser_loss_count }}</p>
+        <h2>Session Information</h2>
 
-    <p><strong>Total Suspicious Events :</strong> {{ total_events }}</p>
+        <p><strong>Session ID :</strong> {{ session_id }}</p>
 
-    <hr>
+        <p><strong>Total Session Duration :</strong> {{ session_duration }}</p>
 
-    <!-- Back to Dashboard Button -->
-    <a href="{{ url_for('auth.dashboard') }}">
-        <button>
-            Back to Dashboard
-        </button>
-    </a>
+    </div>
+
+    <!-- Monitoring Statistics -->
+    <div class="card">
+
+        <h2>Monitoring Statistics</h2>
+
+        <p><strong>Face Absence Count :</strong> {{ face_absence_count }}</p>
+
+        <p><strong>Browser Focus Loss Count :</strong> {{ browser_loss_count }}</p>
+
+        <p><strong>Total Suspicious Events :</strong> {{ total_events }}</p>
+
+    </div>
+
+    <!-- Event Summary -->
+    <div class="card">
+
+        <h2>Event Summary</h2>
+
+        <table>
+
+            <tr>
+
+                <th>Event Type</th>
+
+                <th>Timestamp</th>
+
+                <th>Score Deducted</th>
+
+            </tr>
+
+            {% for event in event_summary %}
+
+            <tr>
+
+                <td>{{ event.event_type }}</td>
+
+                <td>{{ event.timestamp }}</td>
+
+                <td>-{{ event.deduction }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+    <!-- Final Result -->
+    <div class="card result">
+
+        <h2>Final Integrity Result</h2>
+
+        <div class="score">
+
+            {{ score }}/100
+
+        </div>
+
+        <div class="risk">
+
+            {{ risk }}
+
+        </div>
+
+    </div>
+
+    <div style="text-align:center;">
+
+        <a href="{{ url_for('auth.dashboard') }}">
+
+            <button>
+
+                Back to Dashboard
+
+            </button>
+
+        </a>
+
+    </div>
+
+</div>
 
 </body>
 

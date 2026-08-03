@@ -5,87 +5,175 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Dashboard</title>
+    <title>Candidate Dashboard</title>
 
     <link rel="stylesheet"
-          href="{{ url_for('static', filename='css/style.css') }}">
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="dashboard-wrapper">
 
-    <h1>Candidate Dashboard</h1>
+    <!-- ========================================= -->
+    <!-- Header -->
+    <!-- ========================================= -->
 
-    <hr>
+    <div class="dashboard-header">
 
+        <h1>Candidate Dashboard</h1>
+
+    </div>
+
+    <!-- ========================================= -->
     <!-- Flash Messages -->
+    <!-- ========================================= -->
 
     {% with messages = get_flashed_messages() %}
+
         {% if messages %}
+
             {% for message in messages %}
 
                 <div class="message">
+
                     {{ message }}
+
                 </div>
 
             {% endfor %}
+
         {% endif %}
+
     {% endwith %}
 
-    <h2>Candidate Name:  {{ name }} </h2>
+    <!-- ========================================= -->
+    <!-- Welcome Card -->
+    <!-- ========================================= -->
 
-    <br>
+    <div class="welcome-card">
 
-    <div class="card">
+        <h2>
 
-        <h3>Your Details</h3>
+            Welcome,
 
-        <p>
-            <strong>Candidate ID :</strong>
-            {{ candidate_id }}
-        </p>
-
-        <p>
-            <strong>Name :</strong>
             {{ name }}
-        </p>
+
+        </h2>
 
         <p>
-            <strong>Email :</strong>
-            {{ email }}
+
+            You are successfully logged in to the
+
+            <strong>Online Monitoring System</strong>
+
         </p>
 
     </div>
 
-    <br>
+    <!-- ========================================= -->
+    <!-- Main Dashboard -->
+    <!-- ========================================= -->
 
-    <a href="{{ url_for('exam.exam_page') }}">
+    <div class="dashboard-grid">
 
-        <button>
-            Start Online Exam
-        </button>
+        <!-- ============================ -->
+        <!-- Candidate Details -->
+        <!-- ============================ -->
 
-    </a>
+        <div class="dashboard-card">
 
-    <br><br>
+            <h2>Candidate Information</h2>
 
-    <a href="{{ url_for('auth.logout') }}">
+            <table>
 
-        <button class="logout-btn">
-            Logout
-        </button>
+                <tr>
 
-    </a>
+                    <td><strong>Candidate ID</strong></td>
 
-    <br><br>
+                    <td>{{ candidate_id }}</td>
 
-    <a href="{{ url_for('home') }}">
-        Back to Home
-    </a>
+                </tr>
+
+                <tr>
+
+                    <td><strong>Name</strong></td>
+
+                    <td>{{ name }}</td>
+
+                </tr>
+
+                <tr>
+
+                    <td><strong>Email</strong></td>
+
+                    <td>{{ email }}</td>
+
+                </tr>
+
+            </table>
+
+        </div>
+
+        <!-- ============================ -->
+        <!-- Quick Actions -->
+        <!-- ============================ -->
+
+        <div class="dashboard-card">
+
+            <h2>Quick Actions</h2>
+
+            <a href="{{ url_for('exam.exam_page') }}">
+
+                <button class="action-btn">
+
+                    Start Examination
+
+                </button>
+
+            </a>
+
+            <a href="{{ url_for('auth.logout') }}">
+
+                <button class="logout-btn">
+
+                    Logout
+
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ========================================= -->
+    <!-- Instructions -->
+    <!-- ========================================= -->
+
+    <div class="instruction-card">
+
+        <h2>Examination Instructions</h2>
+
+        <ul>
+
+            <li>Ensure your webcam is connected before starting the exam.</li>
+
+            <li>Keep your face visible throughout the examination.</li>
+
+            <li>Avoid switching browser tabs or windows.</li>
+
+            <li>Any suspicious activity will be recorded.</li>
+
+            <li>Your Integrity Score will be generated after the examination.</li>
+
+        </ul>
+
+    </div>
 
 </div>
 

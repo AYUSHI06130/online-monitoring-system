@@ -6,73 +6,100 @@
     <title>Candidate Login</title>
 
     <link rel="stylesheet"
-    href="{{ url_for('static', filename='css/style.css') }}">
+    href="{{ url_for('static', filename='css/common.css') }}">
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/login.css') }}">
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="login-wrapper">
 
-<h2>Candidate Login</h2>
+    <div class="login-card">
 
-{% with messages = get_flashed_messages() %}
+        <div class="login-title">
 
-{% if messages %}
+            <h2>Candidate Login</h2>
 
-{% for message in messages %}
+            <p>Online Monitoring System</p>
 
-<div class="message">
+        </div>
 
-{{ message }}
+        <!-- Flash Messages -->
 
-</div>
+        <div class="flash-container">
 
-{% endfor %}
+            {% with messages = get_flashed_messages() %}
 
-{% endif %}
+                {% if messages %}
 
-{% endwith %}
+                    {% for message in messages %}
 
-<form method="POST">
+                        <div class="flash flash-warning">
 
-<label>Email</label>
+                            {{ message }}
 
-<input
-type="email"
-name="email"
-placeholder="Enter Email"
-required>
+                        </div>
 
-<label>Password</label>
+                    {% endfor %}
 
-<input
-type="password"
-name="password"
-placeholder="Enter Password"
-required>
+                {% endif %}
 
-<button type="submit">
+            {% endwith %}
 
-Login
+        </div>
 
-</button>
+        <!-- Login Form -->
 
-</form>
+        <form method="POST" class="login-form">
 
-<br>
+            <label>Email</label>
 
-<p>
+            <input
+                type="email"
+                name="email"
+                placeholder="Enter Email"
+                required>
 
-Don't have an account?
+            <label>Password</label>
 
-<a href="/register">
+            <input
+                type="password"
+                name="password"
+                placeholder="Enter Password"
+                required>
 
-Register Here
+            <button
+                type="submit"
+                class="btn btn-full login-btn">
 
-</a>
+                Login
 
-</p>
+            </button>
+
+        </form>
+
+        <!-- Footer -->
+
+        <div class="login-footer">
+
+            <p>
+
+                Don't have an account?
+
+                <a href="{{ url_for('auth.register') }}">
+
+                    Register Here
+
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
 
 </div>
 

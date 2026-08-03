@@ -7,6 +7,7 @@ import cv2
 
 from utils.camera_manager import CameraManager
 from utils.integrity_score import calculate_integrity_score
+from utils.integrity_score import calculate_integrity_score, PENALTIES
 
 import sqlite3
 from datetime import datetime
@@ -191,13 +192,13 @@ def start_exam():
 
         if latest[1] == "Running":
 
-            flash("Exam is already running.")
+        
 
             return redirect(url_for("exam.exam_page"))
 
         if latest[1] == "Paused":
 
-            flash("Resume the exam instead of starting again.")
+        
 
             return redirect(url_for("exam.exam_page"))
 
@@ -258,7 +259,7 @@ def start_exam():
     connection.commit()
     connection.close()
 
-    flash("Exam started successfully")
+    
 
     return redirect(url_for("exam.exam_page"))
 
@@ -367,7 +368,7 @@ def toggle_exam():
 
         ))
 
-        flash("Exam Paused Successfully.")
+    
 
     # ==========================================
     # Resume Exam
@@ -430,7 +431,7 @@ def toggle_exam():
 
         ))
 
-        flash("Exam Resumed Successfully.")
+        
 
     # ==========================================
     # Already Ended
@@ -438,7 +439,7 @@ def toggle_exam():
 
     elif status == "Ended":
 
-        flash("Exam has already ended.")
+        
         connection.close()
 
         return redirect(url_for("exam.exam_page"))
@@ -466,7 +467,7 @@ def end_exam():
 
     if latest is None:
 
-        flash("Start the exam first.")
+        
 
         return redirect(url_for("exam.exam_page"))
 
@@ -476,7 +477,7 @@ def end_exam():
 
     if status == "Ended":
 
-        flash("Exam already ended.")
+        
 
         return redirect(url_for("exam.exam_page"))
 
@@ -523,6 +524,12 @@ def end_exam():
         session_id
     )
 
+    # ------------------------------------
+    # Candidate Information
+    # ------------------------------------
+
+    candidate_name = session["name"]
+
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
 
@@ -560,6 +567,93 @@ def end_exam():
 
     total_events = cursor.fetchone()[0]
 
+    # ------------------------------------
+    # Session Duration
+    # ------------------------------------
+
+    cursor.execute("""
+    SELECT
+        start_time,
+        end_time
+
+    FROM Session
+
+    WHERE session_id=?
+    """,
+    (
+        session_id,
+    ))
+
+    session_data = cursor.fetchone()
+
+    start_time = datetime.strptime(
+        session_data[0],
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    end_time = datetime.strptime(
+        session_data[1],
+        "%Y-%m-%d %H:%M:%S"
+    )
+
+    duration = end_time - start_time
+
+    total_seconds = int(duration.total_seconds())
+
+    hours = total_seconds // 3600
+
+    minutes = (total_seconds % 3600) // 60
+
+    seconds = total_seconds % 60
+
+    session_duration = (
+        f"{hours:02}:{minutes:02}:{seconds:02}"
+    )
+
+    # ------------------------------------
+    # Event Summary
+    # ------------------------------------
+
+    cursor.execute("""
+    SELECT
+        event_type,
+        timestamp
+
+    FROM EventLog
+
+    WHERE
+        candidate_id=?
+        AND session_id=?
+
+    ORDER BY timestamp ASC
+    """,
+    (
+        candidate_id,
+        session_id
+    ))
+
+    events = cursor.fetchall()
+    event_summary = []
+
+    for event in events:
+
+        event_type = event[0]
+
+        timestamp = event[1]
+
+        deduction = PENALTIES.get(event_type, 0)
+
+        event_summary.append({
+
+            "event_type": event_type,
+
+            "timestamp": timestamp,
+
+            "deduction": deduction
+
+        })
+
+
     connection.close()
     global camera_manager
 
@@ -569,15 +663,25 @@ def end_exam():
 
         camera_manager = None
 
-    flash("Exam Ended Successfully.")
+    
 
     return render_template(
         "result.html",
+
+        candidate_id=candidate_id,
+        candidate_name=candidate_name,
+        session_id=session_id,
+
         score=result["score"],
         risk=result["risk"],
+
         face_absence_count=face_absence_count,
         browser_loss_count=browser_loss_count,
-        total_events=total_events
+        total_events=total_events,
+
+        session_duration=session_duration,
+        event_summary=event_summary
+
     )
 
 # ==========================================

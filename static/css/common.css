@@ -1,0 +1,592 @@
+/* ==========================================================
+   COMMON.CSS
+   Used by:
+   - Login
+   - Registration
+   - Dashboard
+   - Exam
+   - Integrity Report
+========================================================== */
+
+
+/* ==========================================================
+   RESET
+========================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+body{
+
+    background:#FFF7FA;
+
+    color:#333;
+
+    padding:24px;
+
+    min-height:100vh;
+
+}
+
+
+/* ==========================================================
+   CONTAINER
+========================================================== */
+
+.container{
+
+    max-width:1450px;
+
+    margin:auto;
+
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.page-header{
+
+    background:#F4C5DA;
+
+    color:#8B3F68;
+
+    border-radius:22px;
+
+    padding:24px;
+
+    text-align:center;
+
+    margin-bottom:24px;
+
+    box-shadow:0 8px 20px rgba(228,170,196,.25);
+
+}
+
+.page-header h1{
+
+    font-size:42px;
+
+    font-weight:700;
+
+}
+
+
+/* ==========================================================
+   CARD
+========================================================== */
+
+.card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:18px;
+
+    padding:22px;
+
+    box-shadow:0 6px 18px rgba(228,170,196,.18);
+
+}
+
+
+/* ==========================================================
+   CARD TITLE
+========================================================== */
+
+.card h2{
+
+    color:#C76190;
+
+    font-size:22px;
+
+    margin-bottom:18px;
+
+}
+
+
+/* ==========================================================
+   TEXT
+========================================================== */
+
+p{
+
+    line-height:1.6;
+
+    font-size:17px;
+
+}
+
+
+/* ==========================================================
+   LABEL
+========================================================== */
+
+label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    color:#444;
+
+}
+
+
+/* ==========================================================
+   INPUTS
+========================================================== */
+
+input{
+
+    width:100%;
+
+    padding:12px 16px;
+
+    margin-bottom:18px;
+
+    border:1px solid #E5C4D3;
+
+    border-radius:12px;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+input:focus{
+
+    border-color:#E58CB2;
+
+    box-shadow:0 0 10px rgba(229,140,178,.35);
+
+}
+
+
+/* ==========================================================
+   BUTTON
+========================================================== */
+
+.btn{
+
+    background:#E58CB2;
+
+    color:white;
+
+    border:none;
+
+    border-radius:14px;
+
+    padding:12px 22px;
+
+    cursor:pointer;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+    box-shadow:0 6px 15px rgba(224,145,183,.35);
+
+}
+
+.btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-2px);
+
+}
+
+.btn:active{
+
+    transform:scale(.97);
+
+}
+
+
+/* ==========================================================
+   FULL BUTTON
+========================================================== */
+
+.btn-full{
+
+    width:100%;
+
+}
+
+
+/* ==========================================================
+   SECONDARY BUTTON
+========================================================== */
+
+.btn-secondary{
+
+    background:#B06D93;
+
+}
+
+.btn-secondary:hover{
+
+    background:#99547A;
+
+}
+
+
+/* ==========================================================
+   DANGER BUTTON
+========================================================== */
+
+.btn-danger{
+
+    background:#E56A6A;
+
+}
+
+.btn-danger:hover{
+
+    background:#D94C4C;
+
+}
+
+
+/* ==========================================================
+   SUCCESS BUTTON
+========================================================== */
+
+.btn-success{
+
+    background:#61B87A;
+
+}
+
+.btn-success:hover{
+
+    background:#4EA969;
+
+}
+
+
+/* ==========================================================
+   FLASH MESSAGE
+========================================================== */
+
+.flash{
+
+    padding:16px;
+
+    border-radius:14px;
+
+    margin-bottom:20px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}
+
+
+/* Success */
+
+.flash-success{
+
+    background:#EAF8EE;
+
+    color:#2D7A4E;
+
+    border:1px solid #BEE5C8;
+
+}
+
+
+/* Error */
+
+.flash-error{
+
+    background:#FDECEC;
+
+    color:#B33A3A;
+
+    border:1px solid #F3B2B2;
+
+}
+
+
+/* Warning */
+
+.flash-warning{
+
+    background:#FFF8E6;
+
+    color:#AA7A00;
+
+    border:1px solid #F7D78A;
+
+}
+
+
+/* ==========================================================
+   LINK
+========================================================== */
+
+a{
+
+    color:#C76190;
+
+    text-decoration:none;
+
+    transition:.2s;
+
+}
+
+a:hover{
+
+    color:#A64974;
+
+}
+
+
+/* ==========================================================
+   CENTER
+========================================================== */
+
+.text-center{
+
+    text-align:center;
+
+}
+
+
+/* ==========================================================
+   FLEX
+========================================================== */
+
+.flex{
+
+    display:flex;
+
+}
+
+.flex-center{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.flex-between{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.flex-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.grid-2{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:20px;
+
+}
+
+.grid-3{
+
+    display:grid;
+
+    grid-template-columns:repeat(3,1fr);
+
+    gap:20px;
+
+}
+
+
+/* ==========================================================
+   BADGES
+========================================================== */
+
+.badge{
+
+    display:inline-block;
+
+    padding:6px 14px;
+
+    border-radius:20px;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+.badge-success{
+
+    background:#DFF7E7;
+
+    color:#2D7A4E;
+
+}
+
+.badge-warning{
+
+    background:#FFF4D9;
+
+    color:#AA7A00;
+
+}
+
+.badge-danger{
+
+    background:#FCE4E4;
+
+    color:#B33A3A;
+
+}
+
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:#F4C5DA;
+
+    color:#8B3F68;
+
+    padding:14px;
+
+}
+
+td{
+
+    padding:14px;
+
+    border-bottom:1px solid #F0D4E0;
+
+}
+
+
+/* ==========================================================
+   SPACING
+========================================================== */
+
+.mt-10{
+
+    margin-top:10px;
+
+}
+
+.mt-20{
+
+    margin-top:20px;
+
+}
+
+.mt-30{
+
+    margin-top:30px;
+
+}
+
+.mb-10{
+
+    margin-bottom:10px;
+
+}
+
+.mb-20{
+
+    margin-bottom:20px;
+
+}
+
+.mb-30{
+
+    margin-bottom:30px;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:900px){
+
+    .grid-2{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .grid-3{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    body{
+
+        padding:14px;
+
+    }
+
+    .page-header h1{
+
+        font-size:32px;
+
+    }
+
+}

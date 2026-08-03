@@ -1,0 +1,366 @@
+/* ==========================================================
+   GLOBAL
+========================================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Arial, sans-serif;
+}
+
+body{
+
+    background:#FFF7FA;
+
+    padding:25px;
+
+    color:#333;
+
+}
+
+/* ==========================================================
+   PAGE WRAPPER
+========================================================== */
+
+.register-wrapper{
+
+    max-width:1400px;
+
+    margin:auto;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.register-header{
+
+    background:#F4C5DA;
+
+    color:#8B3F68;
+
+    text-align:center;
+
+    padding:22px;
+
+    border-radius:20px;
+
+    margin-bottom:22px;
+
+    box-shadow:0 8px 20px rgba(228,170,196,.22);
+
+}
+
+.register-header h1{
+
+    font-size:38px;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   FLASH MESSAGE
+========================================================== */
+
+.message{
+
+    background:#FFE9F2;
+
+    color:#B64979;
+
+    border:1px solid #F4C7D8;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    margin-bottom:18px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   MAIN CARD
+========================================================== */
+
+.register-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:22px;
+
+    padding:40px;
+
+    box-shadow:0 8px 22px rgba(228,170,196,.18);
+
+}
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.register-title{
+
+    text-align:center;
+
+    margin-bottom:35px;
+
+}
+
+.register-title h2{
+
+    color:#C76190;
+
+    font-size:30px;
+
+    margin-bottom:8px;
+
+}
+
+.register-title p{
+
+    color:#777;
+
+    font-size:16px;
+
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:24px;
+
+    margin-bottom:30px;
+
+}
+
+/* ==========================================================
+   FORM GROUP
+========================================================== */
+
+.form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.form-group label{
+
+    font-size:16px;
+
+    font-weight:600;
+
+    color:#444;
+
+    margin-bottom:8px;
+
+}
+
+.form-group input{
+
+    width:100%;
+
+    padding:14px 16px;
+
+    border:1px solid #E7CAD8;
+
+    border-radius:12px;
+
+    outline:none;
+
+    font-size:15px;
+
+    transition:.25s;
+
+}
+
+.form-group input:focus{
+
+    border-color:#E58CB2;
+
+    box-shadow:0 0 10px rgba(229,140,178,.30);
+
+}
+
+/* ==========================================================
+   PHOTO INSTRUCTION
+========================================================== */
+
+.instruction-box{
+
+    background:#FFF3F8;
+
+    border-left:6px solid #E58CB2;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    margin:10px 0 30px;
+
+}
+
+.instruction-box h3{
+
+    color:#C76190;
+
+    margin-bottom:12px;
+
+    font-size:22px;
+
+}
+
+.instruction-box p{
+
+    margin-bottom:12px;
+
+    line-height:1.6;
+
+}
+
+.instruction-box ul{
+
+    padding-left:25px;
+
+}
+
+.instruction-box li{
+
+    margin-bottom:8px;
+
+    line-height:1.5;
+
+}
+
+/* ==========================================================
+   BUTTON
+========================================================== */
+
+.register-btn{
+
+    width:100%;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#E58CB2;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 6px 18px rgba(224,145,183,.35);
+
+}
+
+.register-btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-2px);
+
+}
+
+.register-btn:active{
+
+    transform:scale(.98);
+
+}
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.login-link{
+
+    margin-top:30px;
+
+    text-align:center;
+
+    font-size:16px;
+
+}
+
+.login-link a{
+
+    color:#C76190;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+}
+
+.login-link a:hover{
+
+    color:#A54772;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:900px){
+
+    .form-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:700px){
+
+    body{
+
+        padding:15px;
+
+    }
+
+    .register-card{
+
+        padding:25px;
+
+    }
+
+    .register-header h1{
+
+        font-size:30px;
+
+    }
+
+    .register-title h2{
+
+        font-size:24px;
+
+    }
+
+}

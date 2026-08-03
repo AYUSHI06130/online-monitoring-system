@@ -1,40 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
-<title>Online Monitoring System</title>
+    <meta charset="UTF-8">
 
-<link rel="stylesheet"
-href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Online Monitoring System</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/index.css') }}">
 
 </head>
 
 <body>
 
-<div class="container">
+<div class="home-wrapper">
 
-<h1>
+    <!-- =============================== -->
+    <!-- Header -->
+    <!-- =============================== -->
 
-Online Monitoring System
+    <div class="home-header">
 
-</h1>
+        <h1>
 
-<br>
+            Online Examination Monitoring System
 
-<a href="/register">
+        </h1>
 
-Register
+    </div>
 
-</a>
+    <!-- =============================== -->
+    <!-- Main Card -->
+    <!-- =============================== -->
 
-<br><br>
+    <div class="home-card">
 
-<a href="/login">
+        <h2>
 
-Login
+            Welcome
 
-</a>
+        </h2>
+
+
+        <div class="button-group">
+
+            <a href="{{ url_for('auth.login') }}">
+
+                <button class="primary-btn">
+
+                    Candidate Login
+
+                </button>
+
+            </a>
+
+            <a href="{{ url_for('auth.register') }}">
+
+                <button class="secondary-btn">
+
+                    New Registration
+
+                </button>
+
+            </a>
+
+        </div>
+
+    </div>
 
 </div>
 

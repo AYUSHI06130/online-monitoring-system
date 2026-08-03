@@ -2,84 +2,210 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Candidate Registration</title>
 
-    <!-- CSS File -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/register.css') }}">
+
 </head>
 
 <body>
 
-    <div class="container">
+<div class="register-wrapper">
 
-        <h2>Candidate Registration</h2>
+    <!-- ========================================= -->
+    <!-- Header -->
+    <!-- ========================================= -->
 
-        <!-- Display Flash Messages -->
-        {% with messages = get_flashed_messages() %}
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="message">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <div class="register-header">
 
-        <!-- Registration Form -->
-        <form action="/register" method="POST">
+        <h1>Candidate Registration</h1>
 
-            <label for="candidate_id">Candidate ID</label>
-            <input
-                type="text"
-                id="candidate_id"
-                name="candidate_id"
-                placeholder="Enter Candidate ID"
-                required>
+    </div>
 
-            <label for="name">Full Name</label>
-            <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="Enter Full Name"
-                required>
+    <!-- ========================================= -->
+    <!-- Flash Messages -->
+    <!-- ========================================= -->
 
-            <label for="email">Email Address</label>
-            <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter Email"
-                required>
+    {% with messages = get_flashed_messages() %}
 
-            <label for="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                placeholder="Enter Password"
-                required>
+        {% if messages %}
 
-            <button type="submit">
-                Register
+            {% for message in messages %}
+
+                <div class="message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+    <!-- ========================================= -->
+    <!-- Registration Card -->
+    <!-- ========================================= -->
+
+    <div class="register-card">
+
+        <div class="register-title">
+
+            <h2>Create Candidate Account</h2>
+
+            <p>
+
+                Please fill in your details carefully.
+
+            </p>
+
+        </div>
+
+        <!-- ========================================= -->
+        <!-- Form -->
+        <!-- ========================================= -->
+
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label>Candidate ID</label>
+
+                    <input
+
+                        type="text"
+
+                        name="candidate_id"
+
+                        placeholder="Enter Candidate ID"
+
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Candidate Name</label>
+
+                    <input
+
+                        type="text"
+
+                        name="name"
+
+                        placeholder="Enter Full Name"
+
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Email</label>
+
+                    <input
+
+                        type="email"
+
+                        name="email"
+
+                        placeholder="Enter Email Address"
+
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label>Password</label>
+
+                    <input
+
+                        type="password"
+
+                        name="password"
+
+                        placeholder="Create Password"
+
+                        required>
+
+                </div>
+
+            </div>
+
+            <!-- ========================================= -->
+            <!-- Camera Instructions -->
+            <!-- ========================================= -->
+
+            <div class="instruction-box">
+
+                <h3>📷 Photo Verification</h3>
+
+                <p>
+
+                    After clicking
+                    <strong>Register Candidate</strong>,
+                    your webcam will automatically open.
+
+                </p>
+
+                <ul>
+
+                    <li>Press <strong>SPACE</strong> to capture your photo.</li>
+
+                    <li>Press <strong>ESC</strong> to cancel registration.</li>
+
+                    <li>Make sure your face is clearly visible.</li>
+
+                </ul>
+
+            </div>
+
+            <!-- ========================================= -->
+            <!-- Register Button -->
+            <!-- ========================================= -->
+
+            <button
+
+                type="submit"
+
+                class="register-btn">
+
+                Register Candidate
+
             </button>
 
         </form>
 
-        <br>
+        <!-- ========================================= -->
+        <!-- Footer -->
+        <!-- ========================================= -->
 
-        <p>
+        <div class="login-link">
+
             Already have an account?
-            <a href="/login">Login Here</a>
-        </p>
 
-        <br>
+            <a href="{{ url_for('auth.login') }}">
 
-        <a href="/">Back to Home</a>
+                Login Here
+
+            </a>
+
+        </div>
 
     </div>
+
+</div>
 
 </body>
 

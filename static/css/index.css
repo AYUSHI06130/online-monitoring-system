@@ -1,0 +1,283 @@
+/* ==========================================================
+   GLOBAL
+========================================================== */
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family:"Segoe UI", Arial, sans-serif;
+
+}
+
+body{
+
+    background:#FFF7FA;
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:30px;
+
+}
+
+
+/* ==========================================================
+   MAIN WRAPPER
+========================================================== */
+
+.home-wrapper{
+
+    width:100%;
+
+    max-width:1100px;
+
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.home-header{
+
+    background:#F4C5DA;
+
+    color:#8B3F68;
+
+    text-align:center;
+
+    padding:24px;
+
+    border-radius:22px;
+
+    margin-bottom:28px;
+
+    box-shadow:0 8px 22px rgba(228,170,196,.22);
+
+}
+
+.home-header h1{
+
+    font-size:42px;
+
+    font-weight:700;
+
+    letter-spacing:.5px;
+
+}
+
+
+/* ==========================================================
+   MAIN CARD
+========================================================== */
+
+.home-card{
+
+    background:#FFFFFF;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:24px;
+
+    padding:60px 70px;
+
+    text-align:center;
+
+    box-shadow:0 8px 22px rgba(228,170,196,.18);
+
+}
+
+
+/* ==========================================================
+   TITLE
+========================================================== */
+
+.home-card h2{
+
+    font-size:34px;
+
+    color:#C76190;
+
+    margin-bottom:18px;
+
+}
+
+.home-card p{
+
+    font-size:18px;
+
+    color:#666;
+
+    line-height:1.8;
+
+    max-width:650px;
+
+    margin:auto;
+
+    margin-bottom:45px;
+
+}
+
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.button-group{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:30px;
+
+    flex-wrap:wrap;
+
+}
+
+.button-group a{
+
+    text-decoration:none;
+
+}
+
+
+/* ==========================================================
+   LOGIN BUTTON
+========================================================== */
+
+.primary-btn{
+
+    width:240px;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:16px;
+
+    background:#E58CB2;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 6px 18px rgba(224,145,183,.35);
+
+}
+
+.primary-btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-3px);
+
+}
+
+
+/* ==========================================================
+   REGISTER BUTTON
+========================================================== */
+
+.secondary-btn{
+
+    width:240px;
+
+    padding:16px;
+
+    border:2px solid #E58CB2;
+
+    border-radius:16px;
+
+    background:#FFF3F8;
+
+    color:#C76190;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.secondary-btn:hover{
+
+    background:#FADBE7;
+
+    transform:translateY(-3px);
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:900px){
+
+    .home-card{
+
+        padding:45px 30px;
+
+    }
+
+    .home-header h1{
+
+        font-size:32px;
+
+    }
+
+    .home-card h2{
+
+        font-size:28px;
+
+    }
+
+}
+
+@media(max-width:600px){
+
+    body{
+
+        padding:15px;
+
+    }
+
+    .button-group{
+
+        flex-direction:column;
+
+        align-items:center;
+
+    }
+
+    .primary-btn,
+
+    .secondary-btn{
+
+        width:100%;
+
+        max-width:320px;
+
+    }
+
+}

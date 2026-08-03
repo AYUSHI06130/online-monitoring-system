@@ -1,0 +1,147 @@
+/* ==========================================================
+   LOGIN PAGE
+========================================================== */
+
+/* ==========================================
+   Center Login Card
+========================================== */
+
+.login-wrapper{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:80vh;
+
+}
+
+/* ==========================================
+   Login Card
+========================================== */
+
+.login-card{
+
+    width:850px;
+
+    max-width:90%;
+
+    background:#FFFFFF;
+
+    border-radius:22px;
+
+    padding:45px 70px;
+
+    border:1px solid #F3D5E1;
+
+    box-shadow:0 10px 28px rgba(228,170,196,.22);
+
+}
+
+/* ==========================================
+   Logo / Title
+========================================== */
+
+.login-title{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+}
+
+.login-title h2{
+
+    color:#C76190;
+
+    font-size:32px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.login-title p{
+
+    color:#888;
+
+    font-size:15px;
+
+}
+
+/* ==========================================
+   Form
+========================================== */
+
+.login-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+/* ==========================================
+   Login Button
+========================================== */
+
+.login-btn{
+
+    margin-top:10px;
+
+}
+
+/* ==========================================
+   Bottom Text
+========================================== */
+
+.login-footer{
+
+    text-align:center;
+
+    margin-top:25px;
+
+    font-size:15px;
+
+}
+
+.login-footer a{
+
+    font-weight:600;
+
+}
+
+/* ==========================================
+   Flash Messages
+========================================== */
+
+.flash-container{
+
+    margin-bottom:20px;
+
+}
+
+/* ==========================================
+   Responsive
+========================================== */
+
+@media(max-width:600px){
+
+    .login-card{
+
+        padding:30px 25px;
+
+        margin:15px;
+
+    }
+
+    .login-title h2{
+
+        font-size:28px;
+
+    }
+
+}
