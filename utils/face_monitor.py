@@ -13,7 +13,7 @@ class FaceMonitor:
 
         self.candidate_id = candidate_id
 
-        self.SCREENSHOT_FOLDER = "screenshots"
+        self.SCREENSHOT_FOLDER = "evidence"
         os.makedirs(self.SCREENSHOT_FOLDER, exist_ok=True)
 
         self.face_detector = cv2.CascadeClassifier(
@@ -84,6 +84,122 @@ class FaceMonitor:
         connection.close()
 
     # --------------------------------------------------
+    # Update Integrity Score
+    # --------------------------------------------------
+
+    def update_integrity_score(self, penalty):
+
+        connection = sqlite3.connect(DATABASE)
+
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            SELECT session_id
+            FROM Session
+            WHERE candidate_id=?
+            ORDER BY session_id DESC
+            LIMIT 1
+        """, (self.candidate_id,))
+
+        result = cursor.fetchone()
+
+        if result is None:
+
+            connection.close()
+            return
+
+        session_id = result[0]
+
+        # -----------------------------
+        # Current Score
+        # -----------------------------
+
+        cursor.execute("""
+            SELECT
+                current_score,
+                total_events
+            FROM IntegrityScore
+
+            WHERE candidate_id=?
+            AND session_id=?
+        """,
+        (
+            self.candidate_id,
+            session_id
+        ))
+
+        score_data = cursor.fetchone()
+
+        if score_data is None:
+
+            connection.close()
+            return
+
+        current_score = score_data[0]
+        total_events = score_data[1]
+
+        # -----------------------------
+        # Deduct Marks
+        # -----------------------------
+
+        new_score = max(0, current_score - penalty)
+
+        total_events += 1
+
+        # -----------------------------
+        # Risk Level
+        # -----------------------------
+
+        if new_score >= 80:
+
+            risk = "Low"
+
+        elif new_score >= 60:
+
+            risk = "Medium"
+
+        else:
+
+            risk = "High"
+
+        # -----------------------------
+        # Update Database
+        # -----------------------------
+
+        cursor.execute("""
+            UPDATE IntegrityScore
+
+            SET
+
+                current_score=?,
+
+                risk_level=?,
+
+                total_events=?,
+
+                calculated_at=?
+
+            WHERE
+
+                candidate_id=?
+
+            AND
+
+                session_id=?
+        """,
+        (
+            new_score,
+            risk,
+            total_events,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            self.candidate_id,
+            session_id
+        ))
+
+        connection.commit()
+        connection.close()
+
+        print("Integrity Score Updated:", new_score)
 
     def update_monitoring_status(
         self,
@@ -159,7 +275,7 @@ class FaceMonitor:
     def capture_screenshot(self, frame):
 
         candidate_folder = os.path.join(
-            "screenshots",
+            "evidence",
             f"Candidate_{self.candidate_id}"
         )
 
@@ -260,6 +376,7 @@ class FaceMonitor:
                     "Face Not Detected",
                     "Candidate left webcam"
                 )
+                self.update_integrity_score(5)
 
                 self.previous_status = status
 

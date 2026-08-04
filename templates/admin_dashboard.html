@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Admin Dashboard</h1>
+
+    <div class="grid">
+
+        <div class="card">
+            <h2>Total Candidates</h2>
+            <p>{{ total_candidates }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Active Sessions</h2>
+            <p>{{ active_sessions }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Completed Sessions</h2>
+            <p>{{ completed_sessions }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Average Integrity Score</h2>
+            <p>{{ average_score }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Total Suspicious Events</h2>
+            <p>{{ total_events }}</p>
+        </div>
+
+    </div>
+
+</div>
+
+<hr>
+
+<h2>Event Logs</h2>
+<form method="GET" action="{{ url_for('exam.admin_dashboard') }}" class="filter-form">
+
+    <input
+        type="text"
+        name="candidate_id"
+        placeholder="Candidate ID"
+        value="{{ request.args.get('candidate_id','') }}">
+
+    <select name="event_type">
+
+        <option value="">All Events</option>
+
+        <option value="Face Not Detected">Face Not Detected</option>
+
+        <option value="Browser Focus Lost">Browser Focus Lost</option>
+
+        <option value="Browser Tab Changed">Browser Tab Changed</option>
+
+        <option value="Face Returned">Face Returned</option>
+
+        <option value="Exam Started">Exam Started</option>
+
+        <option value="Exam Ended">Exam Ended</option>
+
+    </select>
+
+    <input
+        type="date"
+        name="event_date"
+        value="{{ request.args.get('event_date','') }}">
+
+    <select name="sort_order">
+
+        <option value="DESC"
+            {% if request.args.get('sort_order','DESC') == 'DESC' %}
+                selected
+            {% endif %}
+        >
+            Newest First
+        </option>
+
+        <option value="ASC"
+            {% if request.args.get('sort_order') == 'ASC' %}
+                selected
+            {% endif %}
+        >
+            Oldest First
+        </option>
+
+    </select>    
+
+    <button type="submit">
+
+        Search
+
+    </button>
+    <a href="{{ url_for('exam.admin_dashboard') }}">
+        <button type="button" class="reset-btn">
+            Reset
+        </button>
+    </a>
+
+</form>
+
+<table class="event-table">
+
+    <tr>
+
+        <th>Candidate ID</th>
+
+        <th>Event Type</th>
+
+        <th>Timestamp</th>
+
+        <th>Remarks</th>
+
+        <th>Evidence</th>
+
+    </tr>
+
+    {% for event in event_logs %}
+
+    <tr>
+
+        <td>{{ event[0] }}</td>
+
+        <td>
+
+        {% if event[1] == "Face Not Detected" %}
+
+            <span class="event-badge danger">
+                {{ event[1] }}
+            </span>
+
+        {% elif event[1] == "Browser Focus Lost" %}
+
+            <span class="event-badge warning">
+                {{ event[1] }}
+            </span>
+
+        {% elif event[1] == "Browser Tab Changed" %}
+
+            <span class="event-badge warning">
+                {{ event[1] }}
+            </span>
+
+        {% elif event[1] == "Face Returned" %}
+
+            <span class="event-badge success">
+                {{ event[1] }}
+            </span>
+
+        {% elif event[1] == "Exam Started" %}
+
+            <span class="event-badge info">
+                {{ event[1] }}
+            </span>
+
+        {% elif event[1] == "Exam Ended" %}
+
+            <span class="event-badge info">
+                {{ event[1] }}
+            </span>
+
+        {% else %}
+
+            {{ event[1] }}
+
+        {% endif %}
+
+        </td>
+
+        <td>{{ event[2] }}</td>
+
+        <td>{{ event[3] }}</td>
+
+        <td>
+
+        {% if event[4] %}
+
+            <a href="{{ url_for('exam.view_evidence',filename=event[4].replace('evidence\\', '').replace('\\', '/')) }}"
+                target="_blank"
+                class="evidence-btn">
+
+                View
+
+            </a>
+
+    
+
+        {% else %}
+
+            -
+
+        {% endif %}
+
+        </td>
+
+    </tr>
+
+        
+
+    {% endfor %}
+
+</table>
+
+</body>
+
+</html>

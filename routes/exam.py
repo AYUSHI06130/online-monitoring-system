@@ -3,11 +3,13 @@ from flask import send_from_directory
 from flask import flash, session
 from flask import request,jsonify,session
 from flask import Response
+import os
 import cv2
 
 from utils.camera_manager import CameraManager
-from utils.integrity_score import calculate_integrity_score
+
 from utils.integrity_score import calculate_integrity_score, PENALTIES
+from utils.integrity_score import update_integrity_score
 
 import sqlite3
 from datetime import datetime
@@ -59,6 +61,57 @@ def get_latest_session(candidate_id):
     connection.close()
 
     return latest
+
+
+# ==========================================
+# Save Browser Screenshot
+# ==========================================
+
+def save_browser_screenshot(candidate_id):
+
+    global camera_manager
+
+    if camera_manager is None:
+
+        return None
+
+    frame = camera_manager.get_current_frame()
+
+    if frame is None:
+
+        return None
+
+    candidate_folder = os.path.join(
+
+        "evidence",
+
+        f"Candidate_{candidate_id}"
+
+    )
+
+    os.makedirs(candidate_folder, exist_ok=True)
+
+    filename = (
+
+        "browser_focus_lost_"
+
+        + datetime.now().strftime("%H-%M-%S")
+
+        + ".png"
+
+    )
+
+    filepath = os.path.join(
+
+        candidate_folder,
+
+        filename
+
+    )
+
+    cv2.imwrite(filepath, frame)
+
+    return filepath    
 
 # ==========================================
 # Video Frame Generator
@@ -228,13 +281,43 @@ def start_exam():
 
     ))
 
-    connection.commit()
+    # ------------------------------------------
+    # Get newly created session id
+    # ------------------------------------------
 
-    # Save the Session table record
-    connection.commit()
-
-    # Get the newly created session_id
     session_id = cursor.lastrowid
+
+    # ------------------------------------------
+    # Initialize Integrity Score
+    # ------------------------------------------
+
+    cursor.execute("""
+    INSERT INTO IntegrityScore
+    (
+        candidate_id,
+        session_id,
+        current_score,
+        final_score,
+        risk_level,
+        total_events,
+        calculated_at
+    )
+
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    """,
+    (
+        candidate_id,
+        session_id,
+        100,
+        None,
+        "Low",
+        0,
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    ))
+
+    connection.commit()
+
+    
 
     # Log Exam Started event
     cursor.execute("""
@@ -287,6 +370,34 @@ def log_browser_event():
 
     event_type = data["event_type"]
     remarks = data["remarks"]
+    screenshot_path = save_browser_screenshot(candidate_id)
+    # ------------------------------------------
+    # Live Integrity Score Update
+    # ------------------------------------------
+
+    BROWSER_PENALTIES = {
+
+        "Browser Focus Lost": 10,
+
+        "Browser Tab Changed": 10,
+
+        "Fullscreen Exited": 15,
+
+        "Developer Tools Opened": 20
+
+    }
+
+    penalty = BROWSER_PENALTIES.get(event_type, 0)
+
+    if penalty > 0:
+
+        update_integrity_score(
+
+            candidate_id,
+
+            penalty
+
+    )
 
     connection = sqlite3.connect(DATABASE)
     cursor = connection.cursor()
@@ -298,17 +409,19 @@ def log_browser_event():
             session_id,
             event_type,
             timestamp,
-            remarks
+            remarks,
+            screenshot_path
         )
 
-        VALUES (?, ?, ?, ?,?)
+        VALUES (?, ?, ?, ?, ?, ?)
     """,
     (
         candidate_id,
         session_id,
         event_type,
         datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        remarks
+        remarks,
+        screenshot_path
     ))
 
     connection.commit()
@@ -726,6 +839,7 @@ def get_monitoring_status():
 
         SELECT
             start_time,
+            end_time,
             status,
             paused_at,
             total_pause_seconds
@@ -747,8 +861,6 @@ def get_monitoring_status():
     ))
 
     exam = cursor.fetchone()
-
-    connection.close()
 
     # ----------------------------------
     # Face Status
@@ -774,15 +886,20 @@ def get_monitoring_status():
     if exam:
 
         start_time = datetime.strptime(
+
             exam[0],
+
             "%Y-%m-%d %H:%M:%S"
+
         )
 
-        session_status = exam[1]
+        end_time = exam[1]
 
-        paused_at = exam[2]
+        session_status = exam[2]
 
-        total_pause_seconds = exam[3] or 0
+        paused_at = exam[3]
+
+        total_pause_seconds = exam[4] or 0
 
         # --------------------------
         # Running
@@ -822,41 +939,11 @@ def get_monitoring_status():
 
         elif session_status == "Ended":
 
-            cursor = sqlite3.connect(DATABASE).cursor()
-
-            connection = sqlite3.connect(DATABASE)
-
-            cursor = connection.cursor()
-
-            cursor.execute("""
-
-                SELECT end_time
-
-                FROM Session
-
-                WHERE candidate_id=?
-
-                ORDER BY session_id DESC
-
-                LIMIT 1
-
-            """,
-
-            (
-
-                session["candidate_id"],
-
-            ))
-
-            end = cursor.fetchone()
-
-            connection.close()
-
-            if end and end[0]:
+            if end_time:
 
                 end_time = datetime.strptime(
 
-                    end[0],
+                    end_time,
 
                     "%Y-%m-%d %H:%M:%S"
 
@@ -868,12 +955,53 @@ def get_monitoring_status():
 
                 ) - total_pause_seconds
 
+    # ----------------------------------
+    # Current Integrity Score
+    # ----------------------------------
+
+    cursor.execute("""
+
+        SELECT current_score
+
+        FROM IntegrityScore
+
+        WHERE candidate_id=?
+
+        ORDER BY session_id DESC
+
+        LIMIT 1
+
+    """,
+
+    (
+
+        session["candidate_id"],
+
+    ))
+
+    score = cursor.fetchone()
+
+    if score:
+
+        current_score = score[0]
+
+    else:
+
+        current_score = 100
+
+    connection.close()
+
     return jsonify({
 
         "face_status": face_status,
+
         "face_absence_count": face_absence_count,
+
         "session_status": session_status,
-        "elapsed_seconds": max(elapsed_seconds, 0)
+
+        "elapsed_seconds": max(elapsed_seconds, 0),
+
+        "current_score": current_score
 
     })
 
@@ -903,4 +1031,153 @@ def view_scores():
     return render_template(
         "scores.html",
         scores=scores
+    )    
+
+@exam.route("/admin_dashboard")
+def admin_dashboard():
+
+    connection = sqlite3.connect(DATABASE)
+    cursor = connection.cursor()
+
+    # -------------------------------
+    # Total Candidates
+    # -------------------------------
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM Candidate
+    """)
+
+    total_candidates = cursor.fetchone()[0]
+
+    # -------------------------------
+    # Active Sessions
+    # -------------------------------
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM Session
+        WHERE status='Running'
+    """)
+
+    active_sessions = cursor.fetchone()[0]
+
+    # -------------------------------
+    # Completed Sessions
+    # -------------------------------
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM Session
+        WHERE status='Ended'
+    """)
+
+    completed_sessions = cursor.fetchone()[0]
+
+    # -------------------------------
+    # Average Integrity Score
+    # -------------------------------
+
+    cursor.execute("""
+        SELECT ROUND(AVG(final_score),2)
+        FROM IntegrityScore
+        WHERE final_score IS NOT NULL
+    """)
+
+    result = cursor.fetchone()
+
+    average_score = result[0] if result[0] else 0
+
+    # -------------------------------
+    # Total Suspicious Events
+    # -------------------------------
+
+    cursor.execute("""
+        SELECT COUNT(*)
+        FROM EventLog
+        WHERE event_type != 'Exam Started'
+          AND event_type != 'Exam Ended'
+    """)
+
+    total_events = cursor.fetchone()[0]
+
+    
+    candidate_filter = request.args.get("candidate_id", "")
+    event_filter = request.args.get("event_type", "")
+    date_filter = request.args.get("event_date", "")
+    # --------------------------------
+    # Fetch Event Logs
+    # --------------------------------
+
+    query = """
+
+    SELECT
+
+        candidate_id,
+
+        event_type,
+
+        timestamp,
+
+        remarks,
+
+        screenshot_path
+
+    FROM EventLog
+
+    WHERE 1=1
+
+    """
+
+    params = []
+
+    if candidate_filter:
+
+        query += " AND candidate_id=?"
+        params.append(candidate_filter)
+
+    if event_filter:
+
+        query += " AND event_type=?"
+        params.append(event_filter)
+
+    if date_filter:
+
+        query += " AND DATE(timestamp)=?"
+        params.append(date_filter)
+
+    query += " ORDER BY timestamp DESC"
+
+    cursor.execute(query, params)
+
+    event_logs = cursor.fetchall()
+    connection.close()
+
+    return render_template(
+        "admin_dashboard.html",
+        total_candidates=total_candidates,
+        active_sessions=active_sessions,
+        completed_sessions=completed_sessions,
+        average_score=average_score,
+        total_events=total_events,
+        event_logs=event_logs,
+
+        candidate_filter=candidate_filter,
+        event_filter=event_filter,
+        date_filter=date_filter
+    )
+
+
+# ==========================================
+# View Evidence
+# ==========================================
+
+@exam.route("/evidence/<path:filename>")
+def view_evidence(filename):
+
+    evidence_folder = os.path.join(os.getcwd(), "evidence")
+
+    return send_from_directory(
+        evidence_folder,
+        filename
     )    

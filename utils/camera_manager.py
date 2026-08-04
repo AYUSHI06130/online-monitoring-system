@@ -10,6 +10,8 @@ class CameraManager:
         self.camera = None
         self.candidate_id = candidate_id
 
+        self.current_frame = None
+
         self.face_monitor = FaceMonitor(candidate_id)
 
     # ---------------------------------
@@ -40,9 +42,27 @@ class CameraManager:
 
             return None
 
+        # ---------------------------------
+        # Save latest raw webcam frame
+        # ---------------------------------
+
+        self.current_frame = frame.copy()    
+
         frame = self.face_monitor.process_frame(frame)
 
         return frame
+
+    # ---------------------------------
+    # Return Current Webcam Frame
+    # ---------------------------------
+
+    def get_current_frame(self):
+
+        if self.current_frame is None:
+
+            return None
+
+        return self.current_frame.copy()    
 
     # ---------------------------------
     # Stop Camera

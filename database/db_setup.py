@@ -118,21 +118,26 @@ CREATE TABLE IF NOT EXISTS MonitoringStatus(
 """)
 
 cursor.execute("""
+
 CREATE TABLE IF NOT EXISTS IntegrityScore(
 
     score_id INTEGER PRIMARY KEY AUTOINCREMENT,
 
     candidate_id TEXT NOT NULL,
 
-    session_id INTEGER,
+    session_id INTEGER NOT NULL,
+
+    current_score INTEGER DEFAULT 100,
 
     final_score INTEGER,
 
     risk_level TEXT,
 
-    total_events INTEGER,
+    total_events INTEGER DEFAULT 0,
 
-    calculated_at TEXT
+    calculated_at TEXT,
+
+    UNIQUE(candidate_id, session_id)
 
 )
 """)

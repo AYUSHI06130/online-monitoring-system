@@ -1,0 +1,281 @@
+body{
+
+    background:#FFF8FB;
+
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+.container{
+
+    width:95%;
+
+    margin:auto;
+
+    padding:25px;
+
+}
+
+h1{
+
+    text-align:center;
+
+    color:#C76190;
+
+    margin-bottom:35px;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:15px;
+
+}
+
+.card{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:18px;
+
+    text-align:center;
+
+    box-shadow:0 6px 15px rgba(0,0,0,.08);
+
+    min-height:140px;
+
+}
+
+.card h2{
+
+    color:#C76190;
+
+    font-size:18px;
+
+    margin-bottom:18px;
+
+    line-height:1.3;
+
+}
+
+.card p{
+
+    font-size:34px;
+
+    font-weight:bold;
+
+    margin:0;
+
+}
+
+/* ==========================================
+   Event Log Table
+========================================== */
+
+.event-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-top:30px;
+
+    background:white;
+
+    box-shadow:0 8px 18px rgba(0,0,0,.08);
+
+}
+
+.event-table th{
+
+    background:#E58CB2;
+
+    color:white;
+
+    padding:14px;
+
+    text-align:left;
+
+}
+
+.event-table td{
+
+    padding:12px;
+
+    border-bottom:1px solid #eeeeee;
+
+}
+
+.event-table tr:hover{
+
+    background:#FFF3F8;
+
+}
+
+/* ======================================
+   Event Filters
+====================================== */
+
+.filter-form{
+
+    display:flex;
+
+    gap:15px;
+
+    margin:20px 0;
+
+    flex-wrap:wrap;
+
+}
+
+.filter-form input,
+.filter-form select{
+
+    padding:10px;
+
+    border:1px solid #F3D5E1;
+
+    border-radius:10px;
+
+    min-width:180px;
+
+}
+
+.filter-form button{
+
+    background:#E58CB2;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 20px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+.filter-form button:hover{
+
+    background:#d46b98;
+
+}
+
+/* ======================================
+   Reset Button
+====================================== */
+
+.reset-btn{
+
+    background:#777;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 20px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+.reset-btn:hover{
+
+    background:#555;
+
+}
+
+/* ======================================
+   Event Badges
+====================================== */
+
+.event-badge{
+
+    padding:5px 10px;
+
+    border-radius:20px;
+
+    color:white;
+
+    font-size:13px;
+
+    font-weight:bold;
+
+}
+
+.danger{
+
+    background:#dc3545;
+
+}
+
+.warning{
+
+    background:#f39c12;
+
+}
+
+.success{
+
+    background:#28a745;
+
+}
+
+.info{
+
+    background:#17a2b8;
+
+}
+
+/* ======================================
+   Zebra Rows
+====================================== */
+
+.event-table tr:nth-child(even){
+
+    background:#FFF8FB;
+
+}
+
+.event-table tr:hover{
+
+    background:#FFE8F2;
+
+}
+
+
+.evidence-btn{
+
+    display:inline-block;
+
+    padding:6px 14px;
+
+    background:#D96E9D;
+
+    color:white;
+
+    text-decoration:none;
+
+    border-radius:8px;
+
+    font-size:14px;
+
+    transition:.3s;
+
+}
+
+.evidence-btn:hover{
+
+    background:#C76190;
+
+}

@@ -109,3 +109,126 @@ def calculate_integrity_score(candidate_id, session_id):
         "browser_loss_count": browser_loss_count,
         "total_events": total_events
     }
+
+# ======================================================
+# Live Integrity Score Update
+# ======================================================
+
+def update_integrity_score(candidate_id, penalty):
+
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+
+    # ----------------------------------------
+    # Get Latest Session
+    # ----------------------------------------
+
+    cursor.execute("""
+        SELECT session_id
+        FROM Session
+        WHERE candidate_id=?
+        ORDER BY session_id DESC
+        LIMIT 1
+    """, (candidate_id,))
+
+    row = cursor.fetchone()
+
+    if row is None:
+        conn.close()
+        return
+
+    session_id = row[0]
+
+    # ----------------------------------------
+    # Get Current Score
+    # ----------------------------------------
+
+    cursor.execute("""
+        SELECT
+            current_score,
+            total_events
+        FROM IntegrityScore
+        WHERE
+            candidate_id=?
+        AND
+            session_id=?
+    """,
+    (
+        candidate_id,
+        session_id
+    ))
+
+    result = cursor.fetchone()
+
+    if result is None:
+        conn.close()
+        return
+
+    current_score = result[0]
+    total_events = result[1]
+
+    # ----------------------------------------
+    # Deduct Marks
+    # ----------------------------------------
+
+    new_score = max(0, current_score - penalty)
+
+    total_events += 1
+
+    # ----------------------------------------
+    # Risk Level
+    # ----------------------------------------
+
+    if new_score >= 90:
+        risk = "Excellent"
+
+    elif new_score >= 75:
+        risk = "Low Risk"
+
+    elif new_score >= 50:
+        risk = "Medium Risk"
+
+    elif new_score >= 25:
+        risk = "High Risk"
+
+    else:
+        risk = "Very High Risk"
+
+    # ----------------------------------------
+    # Update Database
+    # ----------------------------------------
+
+    cursor.execute("""
+        UPDATE IntegrityScore
+
+        SET
+
+            current_score=?,
+
+            risk_level=?,
+
+            total_events=?,
+
+            calculated_at=?
+
+        WHERE
+
+            candidate_id=?
+
+        AND
+
+            session_id=?
+    """,
+    (
+        new_score,
+        risk,
+        total_events,
+        datetime.now(),
+        candidate_id,
+        session_id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    print(f"Live Score Updated : {new_score}")    

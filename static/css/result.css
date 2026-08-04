@@ -113,9 +113,9 @@ table td{
 
     text-align:center;
 
-}
 
-button{
+}
+.button{
 
     margin-top:20px;
 
@@ -138,5 +138,55 @@ button{
 button:hover{
 
     background:#8E3D62;
+
+}
+
+/* ==========================================
+   Report Buttons
+========================================== */
+
+.report-buttons{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+    margin-top:35px;
+
+}
+
+/*.back-btn,*/
+.admin-btn{
+
+    width:220px;
+
+    padding:12px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#E58CB2;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+/*.back-btn:hover,*/
+.admin-btn:hover{
+
+    background:#D96E9D;
+
+    transform:translateY(-2px);
 
 }

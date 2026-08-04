@@ -209,7 +209,52 @@ function updateFaceMonitoring() {
             // Current Status  ← ADD THIS
             document.getElementById("exam-status").innerText =
                 data.session_status;
+            
 
+            // ------------------------------------
+            // Live Integrity Score
+            // ------------------------------------
+
+            const scoreElement = document.getElementById("integrity-score");
+
+            scoreElement.innerText = data.current_score;
+
+            const riskElement = document.getElementById("risk-level");
+
+            if (data.current_score >= 90) {
+
+                scoreElement.style.color = "#2ECC71";
+                riskElement.innerText = "Excellent";
+
+            }
+
+            else if (data.current_score >= 75) {
+
+                scoreElement.style.color = "#27AE60";
+                riskElement.innerText = "Low Risk";
+
+            }
+
+            else if (data.current_score >= 50) {
+
+                scoreElement.style.color = "#F39C12";
+                riskElement.innerText = "Medium Risk";
+
+            }
+
+            else if (data.current_score >= 25) {
+
+                scoreElement.style.color = "#E67E22";
+                riskElement.innerText = "High Risk";
+
+            }
+
+            else {
+
+                scoreElement.style.color = "#E74C3C";
+                riskElement.innerText = "Very High Risk";
+
+            }
         })
 
         .catch(error => {

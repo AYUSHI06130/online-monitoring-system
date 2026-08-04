@@ -309,6 +309,7 @@ body{
 
 }
 
+
 /* ==========================================================
    WEBCAM
 ========================================================== */
@@ -359,8 +360,8 @@ body{
 
 .webcam-feed{
 
-    width:420px;
-    height:300px;
+    width:300px;
+    height:240px;
 
     object-fit: contain;
     background: black;
@@ -406,7 +407,7 @@ body{
 
     width:210px;
 
-    padding:12px;
+    padding:10px 15px;
 
     border:none;
 
@@ -598,5 +599,61 @@ body{
         height:240px;
 
     }
+
+}
+
+/* ==========================================================
+   Bottom Integrity Score
+========================================================== */
+
+.integrity-section{
+
+    margin-top:20px;
+
+}
+
+.integrity-card{
+
+    width:100%;
+
+    padding:18px;
+
+    text-align:center;
+
+}
+
+.integrity-line{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin:0;
+
+    font-size:22px;
+
+    font-weight:600;
+
+}
+
+#integrity-score{
+
+    font-size:34px;
+
+    font-weight:700;
+
+    color:#2ECC71;
+
+}
+
+#risk-level{
+
+    font-size:18px;
+
+    color:#666666;
 
 }
